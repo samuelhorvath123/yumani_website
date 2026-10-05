@@ -1,4 +1,5 @@
-#about { --about-blue: oklch(.45 .14 262); background: var(--about-blue); }
+/* clip, not hidden: hidden would make the section a scroll container, and the room's opening would then be measured against it instead of the page. */
+#about { --about-blue: oklch(.45 .14 262); background: var(--about-blue); overflow: hidden; overflow: clip; }
 #about .about-stage { position: relative; isolation: isolate; padding-block: 76px 48px; }
 #about .about-art { position: absolute; z-index: -1; inset: 0 0 0 24%; overflow: hidden; pointer-events: none; opacity: .28; mask-image: linear-gradient(90deg, transparent, black 32%), linear-gradient(180deg, black 55%, transparent); mask-composite: intersect; }
 #about .about-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 48%; }
@@ -9,10 +10,13 @@
 #about .belief-copy { padding-top: 0; }
 #about .belief-copy > p { max-width: 540px; }
 #about .quality-promise { margin-top: 20px; }
-/* The team: a shallow, concave stage. The card in the middle faces you, its neighbours turn toward you and recede,
-   and two sheets of tracing paper fan open behind whoever arrives. All of it is scroll-driven CSS (transform and
-   opacity only, no JavaScript per frame); without that support, or under reduced motion, it is a flat, level strip. */
-#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); timeline-scope: --team-strip; padding-bottom: 12px; }
+/* The team: a room that opens as you scroll into it, holding a shallow, concave stage. The card in the middle faces
+   you; its neighbours turn toward you and dissolve into the blue. All of it is scroll-driven CSS (transform, opacity
+   and the room's clip, no JavaScript per frame); without that support, or under reduced motion, the room is simply
+   open and the strip is flat and level. */
+#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); --team-room-blue: oklch(.38 .13 262); --team-wrap: min(1280px, calc(100% - 112px)); --team-open-scale: .84; --team-open-inset: calc((100% - var(--team-open-scale) * var(--team-wrap)) / 2 - 28px); --team-open-inset-y: 60px; position: relative; isolation: isolate; timeline-scope: --team-strip; view-timeline: --team-open block; padding-block: 52px 16px; }
+/* The room: a deeper, evening blue than the section around it. */
+#about .team-carousel::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(60% 90% at 85% 0%, oklch(.5 .135 272 / .5), transparent 70%), radial-gradient(55% 80% at 8% 100%, oklch(.46 .105 238 / .42), transparent 70%), linear-gradient(180deg, oklch(.4 .13 262), oklch(.34 .12 264)); }
 #about .team-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 28px; }
 #about .team-toolbar h3 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -.035em; line-height: 1.25; }
 #about .team-toolbar p { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: oklch(.84 .038 258); }
@@ -32,10 +36,9 @@
 #about .team-plate { position: relative; aspect-ratio: 4 / 5; }
 #about .team-portrait { position: absolute; inset: 0; overflow: hidden; border-radius: var(--radius-surface); background: oklch(.54 .105 260); box-shadow: 0 34px 44px -28px oklch(.2 .12 262 / .75); }
 #about .team-portrait img, #about .team-slot-art { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-/* A hairline of light on the edge, and a band of light that crosses the portrait (the hero's travelling light at card scale). */
+/* A hairline of light on the edge, and a layer of the room's own blue that thickens as a portrait moves away from the middle. */
 #about .team-portrait::before { content: ''; position: absolute; z-index: 2; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px oklch(.97 .02 258 / .22); pointer-events: none; }
-#about .team-portrait::after { content: ''; position: absolute; z-index: 2; top: 0; bottom: 0; left: -100%; width: 300%; pointer-events: none; background: linear-gradient(100deg, transparent 43%, oklch(1 0 0 / .17) 50%, transparent 57%); }
-#about .team-sheet { display: none; }
+#about .team-portrait::after { content: ''; position: absolute; z-index: 1; inset: 0; background: var(--team-room-blue); opacity: 0; pointer-events: none; }
 #about .team-caption h4 { margin: 14px 0 5px; font-size: 18px; line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
 #about .team-caption p { margin: 0; color: oklch(.83 .038 257); font-size: 13px; line-height: 1.6; }
 
@@ -58,7 +61,7 @@
   @keyframes team-thumb { to { transform: translateX(calc((var(--team-count, 1) - 1) * 100%)); } }
 
   @media (prefers-reduced-motion: no-preference) {
-    #about .team-plate, #about .team-caption, #about .team-portrait img, #about .team-slot-art, #about .team-sheet, #about .team-portrait::after { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --team-in-view; }
+    #about .team-plate, #about .team-caption, #about .team-portrait::after { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --team-in-view; }
     /* The plate turns toward you as it arrives; the caption stays flat, so the type is never rasterised at an angle. Both rise to the middle in one shallow wave, the one the services ribbon draws. */
     #about .team-plate { animation-name: team-stage; }
     #about .team-caption { animation-name: team-wave; }
@@ -68,17 +71,16 @@
       100% { transform: perspective(1000px) translate3d(0, 30px, -40px) rotateY(30deg); }
     }
     @keyframes team-wave { 0%, 100% { transform: translate3d(0, 30px, 0); } 50% { transform: none; } }
-    /* The portrait is a window: the picture slides inside its frame, slower than the frame moves. */
-    #about .team-portrait img, #about .team-slot-art { inset: 0 -14%; width: 128%; animation-name: team-window; }
-    @keyframes team-window { from { transform: translate3d(-6%, 0, 0); } to { transform: translate3d(6%, 0, 0); } }
-    /* Two sheets of tracing paper behind each portrait: stacked tight at the edges, they lift and fan as a card arrives. */
-    #about .team-sheet { display: block; position: absolute; inset: 0; border: 1px solid oklch(.94 .03 258 / .26); border-radius: var(--radius-surface); pointer-events: none; }
-    #about .team-sheet-a { background: linear-gradient(170deg, oklch(.92 .045 258 / .24), oklch(.82 .08 262 / .06)); animation-name: team-sheet-a; }
-    #about .team-sheet-b { background: linear-gradient(190deg, oklch(.92 .045 258 / .15), oklch(.82 .08 262 / .03)); animation-name: team-sheet-b; }
-    @keyframes team-sheet-a { 0%, 100% { transform: translate(0, -2px) scale(.99); opacity: .3; } 50% { transform: translate(-2px, -15px) scale(.95) rotate(-1.4deg); opacity: 1; } }
-    @keyframes team-sheet-b { 0%, 100% { transform: translate(0, -3px) scale(.98); opacity: .2; } 50% { transform: translate(3px, -28px) scale(.9) rotate(1.2deg); opacity: .85; } }
-    #about .team-portrait::after { animation-name: team-sheen; }
-    @keyframes team-sheen { from { transform: translateX(-20%); } to { transform: translateX(20%); } }
+    /* Depth is atmosphere: a portrait that is not yet yours is further away, so it sits deeper in the blue. */
+    #about .team-portrait::after { animation-name: team-haze; }
+    @keyframes team-haze { 0%, 100% { opacity: .7; } 50% { opacity: 0; } }
+
+    /* The room opens as you scroll into it: from a rounded panel inset from the page's margins to a full-bleed band, while everything inside it (heading, controls and stage) draws out from 84% to full size. */
+    #about .team-carousel::before, #about .team-room { animation-fill-mode: both; animation-timeline: --team-open; animation-range: cover 6% cover 42%; }
+    #about .team-carousel::before { animation-name: team-open-room; animation-timing-function: cubic-bezier(.3, .6, .2, 1); }
+    #about .team-room { animation-name: team-open-content; animation-timing-function: cubic-bezier(.3, .6, .2, 1); }
+    @keyframes team-open-room { from { clip-path: inset(var(--team-open-inset-y) var(--team-open-inset) round var(--radius-surface)); } to { clip-path: inset(0px 0px round 0px); } }
+    @keyframes team-open-content { from { transform: scale(var(--team-open-scale)); } to { transform: none; } }
     /* Keyboard focus rings the card in the middle, the one the arrow keys move between, rather than the whole padded strip. */
     #about .team-viewport:focus-visible { outline-color: transparent; }
     #about .team-viewport:focus-visible .team-portrait::before { animation: team-focus linear both; animation-timeline: --team-in-view; }
@@ -93,6 +95,7 @@
 @media (max-width: 1050px) {
   #about .about-stage { padding-block: 64px 40px; }
   #about .about-overview { gap: 36px; }
+  #about .team-carousel { --team-wrap: calc(100% - 64px); }
   #about .team-toolbar h3 { font-size: 27px; }
 }
 @media (max-width: 700px) {
@@ -101,7 +104,7 @@
   #about .about-intro h2 { max-width: 530px; font-size: clamp(38px, 7.9vw, 50px); }
   #about .about-art { inset: 0 -60px 15% 5%; mask-image: linear-gradient(90deg, transparent, black 50%), linear-gradient(180deg, black 25%, transparent); }
   #about .about-lead { max-width: 430px; font-size: 19px; margin-top: 16px; }
-  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); padding-bottom: 8px; }
+  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); --team-wrap: calc(100% - 40px); --team-open-inset-y: 40px; padding-block: 40px 8px; }
   #about .team-toolbar { align-items: start; gap: 20px; }
   #about .team-toolbar h3 { font-size: 24px; max-width: 250px; }
   #about .team-toolbar p { font-size: 12px; max-width: 230px; }

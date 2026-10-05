@@ -106,6 +106,7 @@ export default function TeamCarousel({ children, preview = false }: { children: 
   };
 
   return <div className="team-carousel" style={{ '--team-count': Children.count(children) } as CSSProperties}>
+    <div className="team-room">
     <div className="team-toolbar wrap">
       <div><h3 id="team-title">The people behind Yumani.</h3><p id="team-instructions">{preview ? 'Profile layout preview. Portraits, names and roles pending.' : 'A small team. You’ll know everyone by name.'}</p></div>
       <div className="team-controls">
@@ -128,6 +129,7 @@ export default function TeamCarousel({ children, preview = false }: { children: 
       }}>
         <ul className="team-track">{children}</ul>
       </section>
+    </div>
     </div>
   </div>;
 }
