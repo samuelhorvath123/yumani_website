@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { createDragScroll } from '@/lib/drag-scroll';
 import { createAnimationScheduler } from '@/lib/animation-scheduler';
@@ -105,26 +105,29 @@ export default function TeamCarousel({ children, preview = false }: { children: 
     viewport.scrollTo({ left: edge ? (direction > 0 ? viewport.scrollWidth : 0) : viewport.scrollLeft + distance * direction, behavior });
   };
 
-  return <div className="team-carousel">
+  return <div className="team-carousel" style={{ '--team-count': Children.count(children) } as CSSProperties}>
     <div className="team-toolbar wrap">
       <div><h3 id="team-title">The people behind Yumani.</h3><p id="team-instructions">{preview ? 'Profile layout preview. Portraits, names and roles pending.' : 'A small team. You’ll know everyone by name.'}</p></div>
       <div className="team-controls">
-        <span aria-hidden="true">Drag to explore</span>
+        <div className="team-progress" aria-hidden="true"><i/></div>
         <button type="button" aria-label="Previous team member" aria-controls="team-viewport" disabled={edges.start} onClick={() => step(-1)}><ArrowLeft size={18} aria-hidden="true"/></button>
         <button type="button" aria-label="Next team member" aria-controls="team-viewport" disabled={edges.end} onClick={() => step(1)}><ArrowRight size={18} aria-hidden="true"/></button>
       </div>
     </div>
     <p className="sr-only" id="team-help">Drag or swipe to explore. With this area focused, use the left and right arrow keys to move between profiles, or Home and End to reach either end.</p>
-    {/* This native scroll region needs keyboard focus as an alternative to dragging. */}
-    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
-    <section className="team-viewport" id="team-viewport" ref={viewportRef} tabIndex={0} aria-labelledby="team-title" aria-describedby="team-instructions team-help" onKeyDown={event => {
-      if (event.target !== event.currentTarget) return;
-      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-        event.preventDefault();
-        step(event.key === 'ArrowRight' || event.key === 'End' ? 1 : -1, event.key === 'Home' || event.key === 'End');
-      }
-    }}>
-      <ul className="team-track">{children}</ul>
-    </section>
+    {/* The stage carries the edge fade, so the viewport's focus ring is not clipped by it. */}
+    <div className="team-stage">
+      {/* This native scroll region needs keyboard focus as an alternative to dragging. */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
+      <section className="team-viewport" id="team-viewport" ref={viewportRef} tabIndex={0} aria-labelledby="team-title" aria-describedby="team-instructions team-help" onKeyDown={event => {
+        if (event.target !== event.currentTarget) return;
+        if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+          event.preventDefault();
+          step(event.key === 'ArrowRight' || event.key === 'End' ? 1 : -1, event.key === 'Home' || event.key === 'End');
+        }
+      }}>
+        <ul className="team-track">{children}</ul>
+      </section>
+    </div>
   </div>;
 }

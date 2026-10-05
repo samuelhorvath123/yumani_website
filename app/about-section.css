@@ -9,30 +9,82 @@
 #about .belief-copy { padding-top: 0; }
 #about .belief-copy > p { max-width: 540px; }
 #about .quality-promise { margin-top: 20px; }
-
-#about .team-carousel { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 36px; width: min(1280px, calc(100% - 112px)); margin-inline: auto; padding-bottom: 36px; }
-#about .team-toolbar { display: flex; flex-direction: column; justify-content: space-between; align-items: start; gap: 28px; width: auto; margin: 0; padding-block: 4px 16px; }
+/* The team: a shallow, concave stage. The card in the middle faces you, its neighbours turn toward you and recede,
+   and two sheets of tracing paper fan open behind whoever arrives. All of it is scroll-driven CSS (transform and
+   opacity only, no JavaScript per frame); without that support, or under reduced motion, it is a flat, level strip. */
+#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); timeline-scope: --team-strip; padding-bottom: 12px; }
+#about .team-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 28px; }
 #about .team-toolbar h3 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -.035em; line-height: 1.25; }
-#about .team-toolbar p { margin: 12px 0 0; font-size: 13px; line-height: 1.6; color: oklch(.84 .038 258); }
+#about .team-toolbar p { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: oklch(.84 .038 258); }
 #about .team-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
-#about .team-controls > span { margin-right: 14px; font-size: 12px; color: oklch(.82 .045 257); }
 #about .team-controls button { display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 1px solid oklch(.84 .045 259 / .35); border-radius: var(--radius-control); background: transparent; color: oklch(.97 .01 255); cursor: pointer; transition: background-color 450ms ease, border-color 450ms ease, opacity 350ms ease; }
 #about .team-controls button:hover:enabled { background: oklch(.83 .06 257 / .16); border-color: oklch(.88 .035 259 / .65); }
 #about .team-controls button:disabled { opacity: .35; cursor: default; }
 #about .team-controls button:focus-visible, #about .team-viewport:focus-visible { outline: 2px solid oklch(.9 .055 251); outline-offset: 5px; }
-#about .team-viewport { --team-edge: 0px; min-width: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: var(--team-edge); padding: 4px var(--team-edge) 8px; touch-action: pan-x pan-y; }
+#about .team-progress { display: none; }
+
+/* The stage carries the edge fade, with room around the viewport so its focus ring is not clipped by the mask. */
+#about .team-stage { margin-top: 4px; padding-block: 12px; mask-image: linear-gradient(90deg, transparent, black 9%, black 91%, transparent); }
+#about .team-viewport { min-width: 0; margin-block: -4px -48px; padding-block: 44px 76px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity; scroll-timeline: --team-strip x; touch-action: pan-x pan-y; }
 #about .team-viewport::-webkit-scrollbar { display: none; }
-#about .team-track { display: flex; width: max-content; gap: 24px; list-style: none; margin: 0; padding: 0; }
-#about .team-card { width: clamp(230px, 20vw, 280px); flex: 0 0 auto; scroll-snap-align: start; }
-#about .team-portrait { display: block; position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: oklch(.54 .105 260); }
-#about .team-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; }
-#about .team-card h4 { margin: 14px 0 5px; font-size: 18px; line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
-#about .team-card > p { margin: 0; color: oklch(.83 .038 257); font-size: 13px; line-height: 1.6; }
-#about .team-card-preview .team-portrait { display: flex; flex-direction: column; justify-content: space-between; padding: 22px; border: 1px solid oklch(.86 .04 257 / .18); background: oklch(.53 .11 261 / .6); }
-#about .team-card-preview:nth-child(even) .team-portrait { background: oklch(.55 .098 258 / .6); }
-#about .team-slot-number { color: oklch(.84 .05 256 / .42); font-size: 40px; font-weight: 500; letter-spacing: -.05em; }
-#about .team-slot-label { color: oklch(.85 .04 257); font-size: 13px; }
+#about .team-track { display: flex; width: max-content; gap: 24px; list-style: none; margin: 0; padding: 0 calc(50% - var(--team-card-w) / 2); }
+#about .team-card { width: var(--team-card-w); flex: 0 0 auto; scroll-snap-align: center; view-timeline: --team-in-view inline; }
+#about .team-plate { position: relative; aspect-ratio: 4 / 5; }
+#about .team-portrait { position: absolute; inset: 0; overflow: hidden; border-radius: var(--radius-surface); background: oklch(.54 .105 260); box-shadow: 0 34px 44px -28px oklch(.2 .12 262 / .75); }
+#about .team-portrait img, #about .team-slot-art { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+/* A hairline of light on the edge, and a band of light that crosses the portrait (the hero's travelling light at card scale). */
+#about .team-portrait::before { content: ''; position: absolute; z-index: 2; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px oklch(.97 .02 258 / .22); pointer-events: none; }
+#about .team-portrait::after { content: ''; position: absolute; z-index: 2; top: 0; bottom: 0; left: -100%; width: 300%; pointer-events: none; background: linear-gradient(100deg, transparent 43%, oklch(1 0 0 / .17) 50%, transparent 57%); }
+#about .team-sheet { display: none; }
+#about .team-caption h4 { margin: 14px 0 5px; font-size: 18px; line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
+#about .team-caption p { margin: 0; color: oklch(.83 .038 257); font-size: 13px; line-height: 1.6; }
+
+/* Until the portraits arrive the slots hold a crop of the About artwork, so the stage can be judged as it will read. */
+#about .team-card-preview .team-portrait { display: flex; flex-direction: column; justify-content: space-between; padding: 22px; background: oklch(.53 .11 261); }
+#about .team-slot-art { background: linear-gradient(180deg, transparent 52%, oklch(.3 .11 262 / .55)), url('/images/yumani-about-640.webp') var(--art-x, 50%) var(--art-y, 50%) / auto 118%; }
+#about .team-card-preview:nth-child(1) { --art-x: 8%; --art-y: 90%; }
+#about .team-card-preview:nth-child(2) { --art-x: 44%; --art-y: 70%; }
+#about .team-card-preview:nth-child(3) { --art-x: 52%; --art-y: 20%; }
+#about .team-card-preview:nth-child(4) { --art-x: 92%; --art-y: 30%; }
+#about .team-slot-number, #about .team-slot-label { position: relative; z-index: 1; }
+#about .team-slot-number { color: oklch(.97 .02 256 / .62); font-size: 40px; font-weight: 500; letter-spacing: -.05em; }
+#about .team-slot-label { color: oklch(.96 .02 257); font-size: 13px; }
 #about .belief-principles { padding-block: 22px 26px; }
+
+@supports (animation-timeline: view()) {
+  /* A hairline with a thumb takes the place of the words 'Drag to explore'. */
+  #about .team-progress { display: block; position: relative; overflow: hidden; width: 150px; height: 1px; margin-right: 12px; background: oklch(.84 .045 259 / .28); }
+  #about .team-progress i { position: absolute; inset: 0 auto 0 0; width: calc(100% / var(--team-count, 1)); background: oklch(.96 .02 258); animation: team-thumb linear both; animation-timeline: --team-strip; }
+  @keyframes team-thumb { to { transform: translateX(calc((var(--team-count, 1) - 1) * 100%)); } }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #about .team-plate, #about .team-caption, #about .team-portrait img, #about .team-slot-art, #about .team-sheet, #about .team-portrait::after { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --team-in-view; }
+    /* The plate turns toward you as it arrives; the caption stays flat, so the type is never rasterised at an angle. Both rise to the middle in one shallow wave, the one the services ribbon draws. */
+    #about .team-plate { animation-name: team-stage; }
+    #about .team-caption { animation-name: team-wave; }
+    @keyframes team-stage {
+      0% { transform: perspective(1000px) translate3d(0, 30px, -40px) rotateY(-30deg); }
+      50% { transform: perspective(1000px) translate3d(0, 0, 0) rotateY(0deg); }
+      100% { transform: perspective(1000px) translate3d(0, 30px, -40px) rotateY(30deg); }
+    }
+    @keyframes team-wave { 0%, 100% { transform: translate3d(0, 30px, 0); } 50% { transform: none; } }
+    /* The portrait is a window: the picture slides inside its frame, slower than the frame moves. */
+    #about .team-portrait img, #about .team-slot-art { inset: 0 -14%; width: 128%; animation-name: team-window; }
+    @keyframes team-window { from { transform: translate3d(-6%, 0, 0); } to { transform: translate3d(6%, 0, 0); } }
+    /* Two sheets of tracing paper behind each portrait: stacked tight at the edges, they lift and fan as a card arrives. */
+    #about .team-sheet { display: block; position: absolute; inset: 0; border: 1px solid oklch(.94 .03 258 / .26); border-radius: var(--radius-surface); pointer-events: none; }
+    #about .team-sheet-a { background: linear-gradient(170deg, oklch(.92 .045 258 / .24), oklch(.82 .08 262 / .06)); animation-name: team-sheet-a; }
+    #about .team-sheet-b { background: linear-gradient(190deg, oklch(.92 .045 258 / .15), oklch(.82 .08 262 / .03)); animation-name: team-sheet-b; }
+    @keyframes team-sheet-a { 0%, 100% { transform: translate(0, -2px) scale(.99); opacity: .3; } 50% { transform: translate(-2px, -15px) scale(.95) rotate(-1.4deg); opacity: 1; } }
+    @keyframes team-sheet-b { 0%, 100% { transform: translate(0, -3px) scale(.98); opacity: .2; } 50% { transform: translate(3px, -28px) scale(.9) rotate(1.2deg); opacity: .85; } }
+    #about .team-portrait::after { animation-name: team-sheen; }
+    @keyframes team-sheen { from { transform: translateX(-20%); } to { transform: translateX(20%); } }
+    /* Keyboard focus rings the card in the middle, the one the arrow keys move between, rather than the whole padded strip. */
+    #about .team-viewport:focus-visible { outline-color: transparent; }
+    #about .team-viewport:focus-visible .team-portrait::before { animation: team-focus linear both; animation-timeline: --team-in-view; }
+    @keyframes team-focus { 0%, 44%, 56%, 100% { box-shadow: inset 0 0 0 1px oklch(.97 .02 258 / .22); } 50% { box-shadow: inset 0 0 0 3px oklch(.9 .055 251); } }
+  }
+}
 
 @media (hover: hover) and (pointer: fine) {
   #about .team-viewport { cursor: grab; user-select: none; }
@@ -41,9 +93,7 @@
 @media (max-width: 1050px) {
   #about .about-stage { padding-block: 64px 40px; }
   #about .about-overview { gap: 36px; }
-  #about .team-carousel { width: calc(100% - 64px); grid-template-columns: 180px minmax(0, 1fr); gap: 28px; }
   #about .team-toolbar h3 { font-size: 27px; }
-  #about .team-controls > span { display: none; }
 }
 @media (max-width: 700px) {
   #about .about-stage { padding-block: 48px 32px; }
@@ -51,18 +101,19 @@
   #about .about-intro h2 { max-width: 530px; font-size: clamp(38px, 7.9vw, 50px); }
   #about .about-art { inset: 0 -60px 15% 5%; mask-image: linear-gradient(90deg, transparent, black 50%), linear-gradient(180deg, black 25%, transparent); }
   #about .about-lead { max-width: 430px; font-size: 19px; margin-top: 16px; }
-  #about .team-carousel { display: block; width: 100%; padding-bottom: 28px; }
-  #about .team-toolbar { flex-direction: row; gap: 20px; align-items: start; width: calc(100% - 40px); margin: 0 auto 20px; padding: 0; }
+  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); padding-bottom: 8px; }
+  #about .team-toolbar { align-items: start; gap: 20px; }
   #about .team-toolbar h3 { font-size: 24px; max-width: 250px; }
   #about .team-toolbar p { font-size: 12px; max-width: 230px; }
   #about .team-controls { gap: 7px; }
   #about .team-controls button { width: 36px; height: 36px; }
-  #about .team-viewport { --team-edge: 20px; }
-  #about .team-card { width: clamp(200px, 62vw, 260px); }
-  #about .team-card h4 { margin-top: 13px; font-size: 18px; }
+  #about .team-progress { display: none; }
+  #about .team-caption h4 { margin-top: 13px; font-size: 18px; }
   #about .belief-principles { gap: 14px; padding-block: 20px 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  /* The global rule stops every animation here, which would leave the thumb stuck at the start. */
+  #about .team-progress { display: none; }
   #about .team-viewport { scroll-behavior: auto; }
   #about .team-controls button { transition: none; }
 }
