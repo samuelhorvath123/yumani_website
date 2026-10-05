@@ -22,10 +22,9 @@
 #services .services-ribbon { top: clamp(420px, 38vw, 560px); opacity: .26; }
 
 #services .service-list { display: flex; flex-direction: column; width: 100%; border-color: var(--service-rule); }
-/* Each row starts further in along the wave (see --wave in globals.css), so the list
-   steps like the ribbon above it. Rows end on the same right edge, which keeps the
-   toggles in a line. */
-#services .service-item { margin-left: calc(var(--wave) * var(--service-drift)); }
+/* Each row starts further in than the one above (see --stagger in globals.css). Rows end
+   on the same right edge, which keeps the toggles in a line. */
+#services .service-item { margin-left: calc(var(--stagger) * var(--service-drift)); }
 #services .service-item { position: relative; isolation: isolate; min-width: 0; border-color: var(--service-rule); }
 #services .service-item::before {
   content: '';
