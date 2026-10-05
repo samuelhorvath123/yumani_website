@@ -2,23 +2,27 @@
 #services {
   scroll-margin-top: -200px;
   --service-ease: cubic-bezier(.22, 1, .36, 1);
+  /* How long a service takes to open. 650ms felt like waiting; this is the same
+     curve at about 70% of the time. */
+  --service-open: 460ms;
+  /* The icon draws itself as a service opens: prompt, then steady, then a short clean
+     settle (half drawn at 36% of the time, nine tenths at 70%, peak speed 1.6 times the
+     average). The first version used the page's expo-out curve, half drawn at 13% and
+     nine tenths at 37%, so it slammed in and was over in about 400ms; the second was
+     near-linear and took the best part of a second, which was too slow. This sits
+     between them. Each icon takes the time its stroke deserves, about 380ms plus 4.5ms
+     for every unit of line (the longest is 81, the shortest about 8; the strokes of the measuring icon are timed by hand). */
+  --trace-ease: cubic-bezier(.3, .25, .5, 1);
   --service-column-gap: 36px;
   --service-icon-size: 52px;
+  --service-drift: clamp(0px, 6.6vw, 96px);
   --service-inset: 24px;
   --service-rule: oklch(.79 .041 260 / .38);
 }
 
 #services .services-inner { display: flex; flex-direction: column; gap: 64px; }
-#services .services-heading {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 80px;
-  align-items: end;
-}
 #services .services-heading h2 { margin: 0; }
 #services .services-heading h2 span { color: var(--foreground); }
-#services .services-heading-copy { max-width: 440px; justify-self: end; }
-#services .services-heading-copy p { margin: 0 0 22px; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
 /* A fixed canvas stays still while the disclosure changes the section height. */
 #services .services-atmosphere-clip { position: absolute; z-index: 0; inset: 0; overflow: clip; pointer-events: none; }
 #services .services-atmosphere { bottom: auto; height: clamp(1000px, 90vw, 1280px); }
@@ -26,6 +30,9 @@
 #services .services-ribbon { top: clamp(420px, 38vw, 560px); opacity: .26; }
 
 #services .service-list { display: flex; flex-direction: column; width: 100%; border-color: var(--service-rule); }
+/* Each row starts further in than the one above (see --stagger in globals.css). Rows end
+   on the same right edge, which keeps the toggles in a line. */
+#services .service-item { margin-left: calc(var(--stagger) * var(--service-drift)); }
 #services .service-item { position: relative; isolation: isolate; min-width: 0; border-color: var(--service-rule); }
 #services .service-item::before {
   content: '';
@@ -35,7 +42,7 @@
   pointer-events: none;
   background: linear-gradient(110deg, oklch(.94 .033 264 / .76), oklch(.975 .014 252 / .4) 68%, oklch(.985 .005 255 / 0));
   opacity: 0;
-  transition: opacity 800ms var(--service-ease);
+  transition: opacity 560ms var(--service-ease);
 }
 #services .service-item:has(.service-trigger[aria-expanded='true'])::before { opacity: 1; }
 
@@ -71,7 +78,24 @@
 #services .service-icon-surface { fill: oklch(.91 .039 267 / .66); transition: fill 800ms var(--service-ease); }
 #services .service-trigger:is(:hover, [aria-expanded='true']) .service-icon { color: var(--primary); }
 #services .service-trigger[aria-expanded='true'] .service-icon-surface { fill: oklch(.875 .07 266 / .6); }
-#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1; animation: yumani-service-trace 1050ms var(--service-ease) both; }
+#services .service-icon[data-kind='window'] { --trace-time: 600ms; }
+#services .service-icon[data-kind='measure'] { --trace-time: 330ms; }
+#services .service-icon[data-kind='link'] { --trace-time: 520ms; }
+#services .service-icon[data-kind='page'] { --trace-time: 740ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace var(--trace-time, 600ms) var(--trace-ease) both; }
+/* Custom software is measured on two axes at once: an arrowhead, the line across, then the
+   far arrowhead as the line arrives. The pieces overlap a little so it reads as one pen. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-head { animation-duration: 110ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-line { animation-delay: 70ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-tail { animation-delay: 360ms; animation-duration: 110ms; }
+/* Web applications: the title bar crosses in the time the frame takes to reach it. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-bar { animation-duration: 300ms; }
+/* Practical AI: the page's folded corner is drawn when the line reaches it (the pen is
+   78% of the way round at that point, which the curve makes 57% of the time), and the
+   spark arrives last, as the line settles: the pen is nine tenths done at 520ms. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-fold { animation-delay: 420ms; animation-duration: 170ms; }
+#services .service-icon-spark { transform-box: fill-box; transform-origin: center; }
+#services .service-trigger[aria-expanded='true'] .service-icon-spark { animation: yumani-service-pop 240ms cubic-bezier(.2, .8, .2, 1) 600ms both; }
 
 #services .service-toggle {
   position: relative;
@@ -90,11 +114,47 @@
   height: 1.5px;
   border-radius: 1px;
   background: currentColor;
-  transition: transform 650ms var(--service-ease), opacity 450ms var(--service-ease);
+  transition: transform var(--service-open) var(--service-ease), opacity 320ms var(--service-ease);
 }
 #services .service-toggle span:last-child { transform: rotate(90deg); }
 #services .service-trigger[aria-expanded='true'] .service-toggle { color: var(--primary); border-color: oklch(.68 .11 264 / .5); background: oklch(.98 .012 260 / .6); }
 #services .service-trigger[aria-expanded='true'] .service-toggle span:last-child { transform: rotate(0deg); opacity: 0; }
+
+/* Spotlight. The row under the pointer stays at full strength, the others settle
+   back, the title slides right and a cobalt line draws across the divider. Keyboard
+   focus gives the focused row the slide and the line but does not dim the others:
+   the dim would last as long as focus rests there, and it takes text below WCAG
+   contrast, which is only acceptable for a moment under a pointer. The tokens and the --spot / --on switches are
+   explained with the audience list in globals.css; here the row's header and its
+   panel are what dim, because the row itself carries the arrival animation and
+   the panel's own opacity belongs to opening and closing. The row's own colour
+   and wash on hover are untouched. */
+#services .service-list { --spot: 0; }
+#services .service-item { --on: 0; }
+#services .service-item:has(.service-trigger[aria-expanded='true']) { --spot-floor: var(--spot-floor-open); }
+#services .service-item:has(.service-trigger:focus-visible) { --on: 1; }
+@media (hover: hover) and (pointer: fine) {
+  #services .service-list:has(.service-item:hover) { --spot: 1; }
+  #services .service-item:hover { --on: 1; }
+}
+#services .service-heading, #services .service-panel-clip {
+  opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
+  transition: opacity var(--spot-fade) var(--spot-ease);
+}
+#services .service-title, #services .service-challenge { transition: translate var(--spot-time) var(--spot-ease); }
+#services .service-title { translate: calc(var(--on) * var(--spot-slide)) 0; }
+#services .service-challenge { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
+#services .service-item::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: var(--primary);
+  pointer-events: none;
+  transform: scaleX(var(--on));
+  transform-origin: calc((1 - var(--on)) * 100%) 50%;
+  transition: transform var(--spot-time) var(--spot-ease);
+}
 
 /* Rows animate from 0fr to 1fr, so the panel opens to its natural height with
    nothing measured in script. */
@@ -103,7 +163,7 @@
   grid-template-rows: 0fr;
   opacity: 0;
   font-size: 14px;
-  transition: grid-template-rows 650ms var(--service-ease), opacity 550ms var(--service-ease), visibility 0s linear 650ms;
+  transition: grid-template-rows var(--service-open) var(--service-ease), opacity 380ms var(--service-ease), visibility 0s linear var(--service-open);
   visibility: hidden;
 }
 #services .service-panel[data-open='true'] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
@@ -126,11 +186,15 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
+@keyframes yumani-service-pop {
+  from { opacity: 0; transform: scale(.3); }
+  to { opacity: 1; transform: none; }
+}
 
 @media (max-width: 1050px) {
   #services { scroll-margin-top: -95px; }
   #services { --service-column-gap: 24px; --service-inset: 16px; --service-icon-size: 48px; }
-  #services .services-heading { gap: 48px; }
+  #services { --service-drift: 4.4vw; }
   #services .services-inner { gap: 48px; }
   #services .service-label { grid-template-columns: 1fr; gap: 7px; }
   #services .service-trigger { min-height: 122px; }
@@ -141,9 +205,7 @@
 @media (max-width: 700px) {
   #services { scroll-margin-top: -104px; }
   #services { --service-column-gap: 16px; --service-inset: 0px; --service-icon-size: 40px; }
-  #services .services-heading { grid-template-columns: minmax(0, 1fr); gap: 26px; }
-  #services .services-heading-copy { max-width: 430px; justify-self: start; }
-  #services .services-heading-copy p { margin-bottom: 18px; font-size: 14px; }
+  #services { --service-drift: 18px; }
   #services .services-inner { gap: 38px; }
   #services .services-atmosphere { height: 1100px; }
   #services .services-ribbon { top: 480px; opacity: .2; }
@@ -162,11 +224,13 @@
 
 @media (max-width: 380px) {
   #services { --service-column-gap: 12px; --service-icon-size: 34px; }
+  #services { --service-drift: 10px; }
   #services .service-content { padding-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   #services .service-trigger[aria-expanded='true'] .service-icon-trace { animation: none; stroke-dashoffset: 0; }
+  #services .service-trigger[aria-expanded='true'] .service-icon-spark { animation: none; }
   #services .service-panel { transition: none; }
 }
 

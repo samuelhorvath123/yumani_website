@@ -86,10 +86,6 @@ export default function Home() {
         <div className="services-inner wrap">
           <div className="services-heading" data-reveal="">
             <h2 id="services-title">Your challenges.<br/><span>Our kind of work.</span></h2>
-            <div className="services-heading-copy">
-              <p>New software where nothing fits, connections between the systems you already have, and AI where it genuinely saves time. One aim throughout: fewer hours lost to copying, checking and chasing.</p>
-              <a className="text-link blue-link" href={contactHref}>Tell us what you have in mind <ArrowUpRight size={16} aria-hidden="true"/></a>
-            </div>
           </div>
           <Services />
         </div>

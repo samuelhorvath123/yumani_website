@@ -46,6 +46,25 @@
   --rise-hero-step: 270ms;
   --rise-hero-depth: 44px;
   --rise-art: 3750ms;
+  /* The list spotlight (services, audience): the row under the pointer stays
+     at full strength while its neighbours settle back to --spot-floor, its title
+     slides --spot-slide to the right (the tagline half as far, so the two read as
+     layers) and a hairline of cobalt draws across its divider. Short and sharp
+     where the arrival is slow: a hover is a reply to the pointer, so it has to
+     land before the pointer has moved on. */
+  --spot-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --spot-time: 460ms;
+  --spot-fade: 340ms;
+  --spot-slide: 10px;
+  --spot-floor: 0.36;
+  /* The open service keeps more of its strength, because it is holding text. */
+  --spot-floor-open: 0.62;
+  /* The stagger: how far each of the first four items in a list steps along, as a
+     fraction of that list's full step (services, and the who-this-is-for band). */
+  --stagger-1: 0;
+  --stagger-2: 0.62;
+  --stagger-3: 1;
+  --stagger-4: 0.5;
 }
 
 * { box-sizing: border-box; }
@@ -437,8 +456,59 @@ h3 { font-weight: 600; }
 .audience-heading > p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 430px; margin: 0 0 4px; }
 .audience-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; list-style: none; padding: 0; margin: 64px 0 0; }
 .audience-list li { border-top: 1px solid var(--border); padding-top: 22px; }
+/* Both lists step, from the same four numbers (--stagger-1 to --stagger-4). The service
+   rows start further in (see services.css), the people in the audience band sit lower
+   in turn, and the right-hand edge stays put so the page still has a spine. */
+.service-list, .audience-list { --stagger: 0; }
+:is(.service-list, .audience-list) > :nth-child(1) { --stagger: var(--stagger-1); }
+:is(.service-list, .audience-list) > :nth-child(2) { --stagger: var(--stagger-2); }
+:is(.service-list, .audience-list) > :nth-child(3) { --stagger: var(--stagger-3); }
+:is(.service-list, .audience-list) > :nth-child(4) { --stagger: var(--stagger-4); }
+.audience-list li { margin-top: calc(var(--stagger) * clamp(0px, 3.4vw, 48px)); }
 .audience-list span { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
 .audience-list p { margin: 12px 0 0; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 300px; }
+/* Spotlight (see --spot-* in :root). One pair of switches drives it, both set on
+   the way in and left at 0 otherwise: --spot on the list says "something is
+   being pointed at", --on on a row says "this one". A row's parts then work out
+   their own opacity, slide and line from those two numbers, so a touch screen,
+   where :hover sticks after a tap, simply never sets them. The children are
+   dimmed, never the data-reveal row itself: its opacity belongs to the arrival.
+   The audience columns are 40px apart, so each row's hit area reaches halfway
+   across the gap and the pointer never falls between two of them. That area is a
+   pseudo-element placed BEHIND the row's text (the row is its own stacking context,
+   the pseudo-element sits at z-index -1): in front of it, it took every click and
+   made the paragraphs impossible to select or copy. It exists only where there is a
+   pointer to hover with. */
+.audience-list { --spot: 0; }
+.audience-list li { position: relative; --on: 0; }
+.audience-list li > * {
+  opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
+  transition: opacity var(--spot-fade) var(--spot-ease), translate var(--spot-time) var(--spot-ease);
+}
+.audience-list li > span { translate: calc(var(--on) * var(--spot-slide)) 0; }
+.audience-list li > p { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
+/* The line enters from the left and leaves to the right, so a pointer moving across
+   the band passes the line on, column to column. */
+.audience-list li::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--primary);
+  pointer-events: none;
+  transform: scaleX(var(--on));
+  transform-origin: calc((1 - var(--on)) * 100%) 50%;
+  transition: transform var(--spot-time) var(--spot-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .audience-list:has(li:hover) { --spot: 1; }
+  .audience-list li:hover { --on: 1; }
+  .audience-list li { isolation: isolate; }
+  .audience-list li::after { content: ''; position: absolute; z-index: -1; inset: 0 -20px; }
+}
+@media (prefers-reduced-motion: reduce) { :root { --spot-slide: 0px; } }
+@media (prefers-contrast: more) { :root { --spot-floor: 0.8; --spot-floor-open: 0.9; } }
 /* A button that reads as a link: for actions that stay on the page, such as
    reopening the cookie banner. */
 .link-button { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
@@ -473,6 +543,8 @@ h3 { font-weight: 600; }
   .audience-section { padding-block: 80px; }
   .audience-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
   .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
+  .audience-list li { margin-top: 0; }
+  .audience-list li::after { inset: -16px 0; }
   .audience-list p { max-width: 400px; }
 }
 
