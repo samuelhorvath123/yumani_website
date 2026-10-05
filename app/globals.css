@@ -46,7 +46,7 @@
   --rise-hero-step: 270ms;
   --rise-hero-depth: 44px;
   --rise-art: 3750ms;
-  /* The list spotlight (services, audience, fit): the row under the pointer stays
+  /* The list spotlight (services, audience): the row under the pointer stays
      at full strength while its neighbours settle back to --spot-floor, its title
      slides --spot-slide to the right (the tagline half as far, so the two read as
      layers) and a hairline of cobalt draws across its divider. Short and sharp
@@ -396,15 +396,15 @@ h1 { font-size: inherit; line-height: 1.08; letter-spacing: -0.052em; font-weigh
    the page stays complete without JavaScript, in print and under reduced motion. */
 [data-reveal] { transition: opacity var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms), transform var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms); }
 /* Groups settle in one after another rather than all at once. */
-.service-list .service-item:nth-child(2), .process-list > :nth-child(2), .belief-principles > :nth-child(2), .audience-list > :nth-child(2) { --reveal-delay: var(--rise-stagger); }
-.service-list .service-item:nth-child(3), .process-list > :nth-child(3), .belief-principles > :nth-child(3), .audience-list > :nth-child(3) { --reveal-delay: calc(var(--rise-stagger) * 2); }
-.service-list .service-item:nth-child(4), .belief-principles > :nth-child(4), .audience-list > :nth-child(4) { --reveal-delay: calc(var(--rise-stagger) * 3); }
+.service-list .service-item:nth-child(2), .faq-list .faq-item:nth-child(2), .process-list > :nth-child(2), .fit-grid > :nth-child(2), .belief-principles > :nth-child(2), .audience-list > :nth-child(2) { --reveal-delay: var(--rise-stagger); }
+.service-list .service-item:nth-child(3), .faq-list .faq-item:nth-child(3), .process-list > :nth-child(3), .belief-principles > :nth-child(3), .audience-list > :nth-child(3) { --reveal-delay: calc(var(--rise-stagger) * 2); }
+.service-list .service-item:nth-child(4), .faq-list .faq-item:nth-child(4), .belief-principles > :nth-child(4), .audience-list > :nth-child(4) { --reveal-delay: calc(var(--rise-stagger) * 3); }
 h2 { font-size: clamp(34px, 3.25vw, 47px); font-weight: 500; line-height: 1.19; letter-spacing: -0.04em; margin: 0; }
 /* Headings break evenly rather than orphaning a word; paragraphs avoid a
    single word on their last line. Both degrade silently where unsupported. */
 h1, h2, h3, .rotator { text-wrap: balance; }
 p, li, figcaption, .closing-foot p { text-wrap: pretty; }
-.services-section h2, .approach-section h2, .audience-section h2 { color: var(--heading-quiet); }
+.services-section h2, .audience-section h2, .fit-section h2, .faq-section h2 { color: var(--heading-quiet); }
 h3 { font-weight: 600; }
 .services-section { position: relative; isolation: isolate; padding-block: 200px; }
 .services-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; }
@@ -433,6 +433,7 @@ h3 { font-weight: 600; }
   mask-composite: intersect;
 }
 .services-ribbon img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.blue-link { color: var(--primary); }
 .service-list { border-top: 1px solid var(--border); }
 .service-item { border-bottom: 1px solid var(--border); }
 .service-trigger { color: var(--foreground); }
@@ -449,17 +450,8 @@ h3 { font-weight: 600; }
 .quality-promise svg { color: oklch(0.79 0.10 255); flex-shrink: 0; }
 .belief-principles { display: flex; justify-content: space-between; gap: 30px; border-top: 1px solid oklch(0.75 0.045 256 / 0.28); padding-block: 26px 29px; font-size: 13px; }
 .belief-principles > span { display: flex; gap: 17px; align-items: center; }
-.approach-section { padding-block: 200px; }
-.approach-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 100px; }
-.approach-heading > p { font-size: 14px; line-height: 1.9; color: var(--muted-foreground); max-width: 355px; margin: 0 0 4px; }
-.process-list { display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; padding: 0; margin: 67px 0 0; gap: 54px; }
-.process-top { display: flex; justify-content: space-between; align-items: center; padding-block: 0 22px; border-bottom: 1px solid var(--border); color: var(--primary); }
-.process-top > span { font-family: var(--font-figure); font-size: 12px; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
-.process-list h3 { font-size: 20px; line-height: 1.4; letter-spacing: -0.5px; margin: 25px 0 13px; }
-.process-list p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 330px; margin: 0; }
-/* Who the work is for. Same strip language as the process list, so it reads as
-   a band of people rather than a set of cards. */
-.audience-section { padding-block: 200px; border-top: 1px solid var(--border); }
+/* Who the work is for: a band of people rather than a set of cards. */
+.audience-section { padding-block: 150px; }
 .audience-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 100px; }
 .audience-heading > p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 430px; margin: 0 0 4px; }
 .audience-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; list-style: none; padding: 0; margin: 64px 0 0; }
@@ -475,14 +467,6 @@ h3 { font-weight: 600; }
 .audience-list li { margin-top: calc(var(--stagger) * clamp(0px, 3.4vw, 48px)); }
 .audience-list span { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
 .audience-list p { margin: 12px 0 0; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 300px; }
-.fit-block { margin-top: 96px; padding-top: 56px; border-top: 1px solid var(--border); }
-.fit-title { margin: 0 0 34px; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; color: var(--heading-quiet); }
-.fit-list { margin: 0; display: flex; flex-direction: column; }
-.fit-list > div { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-block: 24px; border-bottom: 1px solid var(--border); }
-.fit-list > div:first-child { padding-top: 0; }
-.fit-list > div:last-child { border-bottom: 0; padding-bottom: 0; }
-.fit-list dt { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
-.fit-list dd { margin: 0; max-width: 460px; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); }
 /* Spotlight (see --spot-* in :root). One pair of switches drives it, both set on
    the way in and left at 0 otherwise: --spot on the list says "something is
    being pointed at", --on on a row says "this one". A row's parts then work out
@@ -491,19 +475,20 @@ h3 { font-weight: 600; }
    dimmed, never the data-reveal row itself: its opacity belongs to the arrival.
    The audience columns are 40px apart, so each row's hit area reaches halfway
    across the gap and the pointer never falls between two of them. */
-.audience-list, .fit-list { --spot: 0; }
-.audience-list li, .fit-list > div { position: relative; --on: 0; }
-.audience-list li > *, .fit-list > div > * {
+.audience-list { --spot: 0; }
+.audience-list li { position: relative; --on: 0; }
+.audience-list li > * {
   opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
   transition: opacity var(--spot-fade) var(--spot-ease), translate var(--spot-time) var(--spot-ease);
 }
-.audience-list li > span, .fit-list dt { translate: calc(var(--on) * var(--spot-slide)) 0; }
-.audience-list li > p, .fit-list dd { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
-/* The line enters from the left and leaves to the right, so a pointer moving down
-   the list passes the line on, row to row. */
-.audience-list li::before, .fit-list > div::before {
+.audience-list li > span { translate: calc(var(--on) * var(--spot-slide)) 0; }
+.audience-list li > p { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
+/* The line enters from the left and leaves to the right, so a pointer moving across
+   the band passes the line on, column to column. */
+.audience-list li::before {
   content: '';
   position: absolute;
+  top: -1px;
   inset-inline: 0;
   height: 1px;
   background: var(--primary);
@@ -512,13 +497,10 @@ h3 { font-weight: 600; }
   transform-origin: calc((1 - var(--on)) * 100%) 50%;
   transition: transform var(--spot-time) var(--spot-ease);
 }
-.audience-list li::before { top: -1px; }
-.fit-list > div::before { bottom: -1px; }
-.fit-list > div:last-child::before { display: none; }
 .audience-list li::after { content: ''; position: absolute; inset: 0 -20px; }
 @media (hover: hover) and (pointer: fine) {
-  .audience-list:has(li:hover), .fit-list:has(> div:hover) { --spot: 1; }
-  .audience-list li:hover, .fit-list > div:hover { --on: 1; }
+  .audience-list:has(li:hover) { --spot: 1; }
+  .audience-list li:hover { --on: 1; }
 }
 @media (prefers-reduced-motion: reduce) { :root { --spot-slide: 0px; } }
 @media (prefers-contrast: more) { :root { --spot-floor: 0.7; --spot-floor-open: 0.8; } }
@@ -529,8 +511,7 @@ h3 { font-weight: 600; }
 @media (max-width: 1050px) {
   .services-section { padding-block: 95px; }
   .services-inner { gap: 55px; }
-  .approach-heading { gap: 65px; }
-  .process-list { gap: 34px; }
+  .audience-section { padding-block: 110px; }
 }
 @media (max-width: 700px) {
   html { --sticky-clearance: 164px; }
@@ -554,17 +535,8 @@ h3 { font-weight: 600; }
   .quality-promise { align-items: flex-start; line-height: 1.7; font-size: 12px; gap: 8px; }
   .quality-promise svg { margin-top: 2px; }
   .belief-principles { flex-direction: column; gap: 21px; padding-block: 27px 35px; font-size: 13px; }
-  .approach-section { padding-block: 104px; }
-  .approach-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .approach-heading > p { font-size: 14px; max-width: 390px; }
-  .process-list { grid-template-columns: 1fr; gap: 35px; margin-top: 40px; }
-  .process-top { padding-bottom: 14px; }
-  .process-list h3 { margin-top: 20px; font-size: 20px; }
-  .process-list p { max-width: 380px; }
+  .audience-section { padding-block: 80px; }
   .audience-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .fit-block { margin-top: 56px; padding-top: 40px; }
-  .fit-title { margin-bottom: 24px; font-size: 20px; }
-  .fit-list > div { grid-template-columns: 1fr; gap: 10px; padding-block: 20px; }
   .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
   .audience-list li { margin-top: 0; }
   .audience-list li::after { inset: 0 0 -16px; }
