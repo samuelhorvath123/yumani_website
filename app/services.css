@@ -2,23 +2,19 @@
 #services {
   scroll-margin-top: -200px;
   --service-ease: cubic-bezier(.22, 1, .36, 1);
+  /* How long a service takes to open. 650ms felt like waiting; this is the same
+     curve at about 70% of the time. */
+  --service-open: 460ms;
   --service-column-gap: 36px;
   --service-icon-size: 52px;
+  --service-drift: clamp(0px, 6.6vw, 96px);
   --service-inset: 24px;
   --service-rule: oklch(.79 .041 260 / .38);
 }
 
 #services .services-inner { display: flex; flex-direction: column; gap: 64px; }
-#services .services-heading {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 80px;
-  align-items: end;
-}
 #services .services-heading h2 { margin: 0; }
 #services .services-heading h2 span { color: var(--foreground); }
-#services .services-heading-copy { max-width: 440px; justify-self: end; }
-#services .services-heading-copy p { margin: 0 0 22px; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
 /* A fixed canvas stays still while the disclosure changes the section height. */
 #services .services-atmosphere-clip { position: absolute; z-index: 0; inset: 0; overflow: clip; pointer-events: none; }
 #services .services-atmosphere { bottom: auto; height: clamp(1000px, 90vw, 1280px); }
@@ -26,6 +22,10 @@
 #services .services-ribbon { top: clamp(420px, 38vw, 560px); opacity: .26; }
 
 #services .service-list { display: flex; flex-direction: column; width: 100%; border-color: var(--service-rule); }
+/* Each row starts further in along the wave (see --wave in globals.css), so the list
+   steps like the ribbon above it. Rows end on the same right edge, which keeps the
+   toggles in a line. */
+#services .service-item { margin-left: calc(var(--wave) * var(--service-drift)); }
 #services .service-item { position: relative; isolation: isolate; min-width: 0; border-color: var(--service-rule); }
 #services .service-item::before {
   content: '';
@@ -35,7 +35,7 @@
   pointer-events: none;
   background: linear-gradient(110deg, oklch(.94 .033 264 / .76), oklch(.975 .014 252 / .4) 68%, oklch(.985 .005 255 / 0));
   opacity: 0;
-  transition: opacity 800ms var(--service-ease);
+  transition: opacity 560ms var(--service-ease);
 }
 #services .service-item:has(.service-trigger[aria-expanded='true'])::before { opacity: 1; }
 
@@ -71,7 +71,8 @@
 #services .service-icon-surface { fill: oklch(.91 .039 267 / .66); transition: fill 800ms var(--service-ease); }
 #services .service-trigger:is(:hover, [aria-expanded='true']) .service-icon { color: var(--primary); }
 #services .service-trigger[aria-expanded='true'] .service-icon-surface { fill: oklch(.875 .07 266 / .6); }
-#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1; animation: yumani-service-trace 1050ms var(--service-ease) both; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace 800ms var(--service-ease) both; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-late { animation-delay: 140ms; }
 
 #services .service-toggle {
   position: relative;
@@ -90,7 +91,7 @@
   height: 1.5px;
   border-radius: 1px;
   background: currentColor;
-  transition: transform 650ms var(--service-ease), opacity 450ms var(--service-ease);
+  transition: transform var(--service-open) var(--service-ease), opacity 320ms var(--service-ease);
 }
 #services .service-toggle span:last-child { transform: rotate(90deg); }
 #services .service-trigger[aria-expanded='true'] .service-toggle { color: var(--primary); border-color: oklch(.68 .11 264 / .5); background: oklch(.98 .012 260 / .6); }
@@ -138,7 +139,7 @@
   grid-template-rows: 0fr;
   opacity: 0;
   font-size: 14px;
-  transition: grid-template-rows 650ms var(--service-ease), opacity 550ms var(--service-ease), visibility 0s linear 650ms;
+  transition: grid-template-rows var(--service-open) var(--service-ease), opacity 380ms var(--service-ease), visibility 0s linear var(--service-open);
   visibility: hidden;
 }
 #services .service-panel[data-open='true'] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
@@ -165,7 +166,7 @@
 @media (max-width: 1050px) {
   #services { scroll-margin-top: -95px; }
   #services { --service-column-gap: 24px; --service-inset: 16px; --service-icon-size: 48px; }
-  #services .services-heading { gap: 48px; }
+  #services { --service-drift: 4.4vw; }
   #services .services-inner { gap: 48px; }
   #services .service-label { grid-template-columns: 1fr; gap: 7px; }
   #services .service-trigger { min-height: 122px; }
@@ -176,9 +177,7 @@
 @media (max-width: 700px) {
   #services { scroll-margin-top: -104px; }
   #services { --service-column-gap: 16px; --service-inset: 0px; --service-icon-size: 40px; }
-  #services .services-heading { grid-template-columns: minmax(0, 1fr); gap: 26px; }
-  #services .services-heading-copy { max-width: 430px; justify-self: start; }
-  #services .services-heading-copy p { margin-bottom: 18px; font-size: 14px; }
+  #services { --service-drift: 18px; }
   #services .services-inner { gap: 38px; }
   #services .services-atmosphere { height: 1100px; }
   #services .services-ribbon { top: 480px; opacity: .2; }
@@ -197,6 +196,7 @@
 
 @media (max-width: 380px) {
   #services { --service-column-gap: 12px; --service-icon-size: 34px; }
+  #services { --service-drift: 10px; }
   #services .service-content { padding-left: 0; }
 }
 

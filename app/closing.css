@@ -108,4 +108,14 @@
   /* The button sits at the left once the foot stacks, so the panel opens from there. */
   .legal-menu-panel { left: 0; right: auto; width: min(280px, calc(100vw - 40px)); }
 }
-@media print { .closing-screen { background: none; color: black; min-height: 0; } }
+/* The page ends on the same wave the about section is cut with: a curved top edge
+   over the evening light, so the last thing you scroll into arrives as a shape and
+   not as a stripe. The compact foot on the other pages stays square, because the
+   Legal panel opens upward out of it and a mask would clip it. */
+.closing-screen:not(.closing-compact) {
+  mask-image: var(--edge-top), linear-gradient(#000, #000);
+  mask-size: 100% var(--edge), 100% calc(100% - var(--edge) + 1px);
+  mask-position: top, bottom;
+  mask-repeat: no-repeat;
+}
+@media print { .closing-screen { background: none; color: black; min-height: 0; mask-image: none; } }

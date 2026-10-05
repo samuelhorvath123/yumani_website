@@ -18,7 +18,12 @@ export default function ServiceIcon({ kind }: { kind: ServiceKind }) {
       </>}
       {kind === 'systems' && <>
         <rect className="service-icon-surface" x="18" y="14" width="14" height="21" rx="3"/>
-        <path className="service-icon-trace" pathLength="1" d="M12 12c5 0 2 8 6 8M12 36c5 0 2-8 6-8M32 24h4"/>
+        {/* Three strokes, three paths: the draw-on measures one dash along a single
+            path, so strokes sharing a path finished within the first few percent of
+            the animation and the icon flashed instead of drawing. */}
+        <path className="service-icon-trace" pathLength="1" d="M12 12c5 0 2 8 6 8"/>
+        <path className="service-icon-trace" pathLength="1" d="M12 36c5 0 2-8 6-8"/>
+        <path className="service-icon-trace service-icon-trace-late" pathLength="1" d="M32 24h4"/>
         <path d="M22 20h6M22 25h6M22 30h3"/>
         <circle cx="8" cy="12" r="1.7" fill="currentColor" stroke="none"/>
         <circle cx="8" cy="36" r="1.7" fill="currentColor" stroke="none"/>

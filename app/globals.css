@@ -59,6 +59,17 @@
   --spot-floor: 0.36;
   /* The open service keeps more of its strength, because it is holding text. */
   --spot-floor-open: 0.62;
+  /* The curved edges and the staggers. One shallow wave, edge to edge, like the
+     ribbon artwork: the deep blue sections take it on their top and bottom edges
+     (a mask, so what shows through is whatever is really behind them), and the
+     lists below step along the same shape. --edge is how tall the wave is. */
+  --edge: clamp(36px, 6.2vw, 96px);
+  --edge-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 58C260 58 380 20 650 20C930 20 1040 74 1280 74C1360 74 1410 66 1440 60V100H0Z'/%3E%3C/svg%3E");
+  --edge-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M1440 42C1180 42 1060 80 790 80C510 80 400 26 160 26C80 26 30 34 0 40V0H1440Z'/%3E%3C/svg%3E");
+  --wave-1: 0;
+  --wave-2: 0.62;
+  --wave-3: 1;
+  --wave-4: 0.5;
 }
 
 * { box-sizing: border-box; }
@@ -427,7 +438,6 @@ h3 { font-weight: 600; }
   mask-composite: intersect;
 }
 .services-ribbon img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.blue-link { color: var(--primary); }
 .service-list { border-top: 1px solid var(--border); }
 .service-item { border-bottom: 1px solid var(--border); }
 .service-trigger { color: var(--foreground); }
@@ -435,6 +445,19 @@ h3 { font-weight: 600; }
 .service-trigger[aria-expanded='true'] { color: var(--primary); }
 .service-content p { color: var(--muted-foreground); }
 .belief-section { background: oklch(0.45 0.14 262); color: oklch(0.97 0.01 255); position: relative; overflow: hidden; }
+/* Curved top and bottom: a three-layer mask (the wave, the solid middle, the wave).
+   The section rises by one edge into the empty foot of the services section, so the
+   notch above the curve shows services' own light, not a flat strip of page colour.
+   Only the painting is curved: the box, and so the section spy and the anchors, stay
+   where they were. The middle layer overlaps each wave by a pixel to hide the seam. */
+.belief-section {
+  margin-top: calc(var(--edge) * -1);
+  mask-image: var(--edge-top), linear-gradient(#000, #000), var(--edge-bottom);
+  mask-size: 100% var(--edge), 100% calc(100% - var(--edge) * 2 + 2px), 100% var(--edge);
+  mask-position: top, center, bottom;
+  mask-repeat: no-repeat;
+}
+@media print { .belief-section { margin-top: 0; mask-image: none; } }
 /* The one sentence the whole page is built around, so it gets the scale. */
 .belief-section h2 { font-size: clamp(42px, 5.4vw, 78px); line-height: 1.07; letter-spacing: -0.05em; }
 .belief-section h2 span { color: oklch(0.79 0.10 255); }
@@ -459,6 +482,15 @@ h3 { font-weight: 600; }
 .audience-heading > p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 430px; margin: 0 0 4px; }
 .audience-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; list-style: none; padding: 0; margin: 64px 0 0; }
 .audience-list li { border-top: 1px solid var(--border); padding-top: 22px; }
+/* The same wave steps both lists. The people in the audience band sit lower in turn,
+   the service rows start further in (see services.css), and the right-hand edge stays
+   put so the page still has a spine. */
+.service-list, .audience-list { --wave: 0; }
+:is(.service-list, .audience-list) > :nth-child(1) { --wave: var(--wave-1); }
+:is(.service-list, .audience-list) > :nth-child(2) { --wave: var(--wave-2); }
+:is(.service-list, .audience-list) > :nth-child(3) { --wave: var(--wave-3); }
+:is(.service-list, .audience-list) > :nth-child(4) { --wave: var(--wave-4); }
+.audience-list li { margin-top: calc(var(--wave) * clamp(0px, 3.4vw, 48px)); }
 .audience-list span { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
 .audience-list p { margin: 12px 0 0; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 300px; }
 .fit-block { margin-top: 96px; padding-top: 56px; border-top: 1px solid var(--border); }
@@ -552,6 +584,7 @@ h3 { font-weight: 600; }
   .fit-title { margin-bottom: 24px; font-size: 20px; }
   .fit-list > div { grid-template-columns: 1fr; gap: 10px; padding-block: 20px; }
   .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
+  .audience-list li { margin-top: 0; }
   .audience-list li::after { inset: 0 0 -16px; }
   .audience-list p { max-width: 400px; }
 }
