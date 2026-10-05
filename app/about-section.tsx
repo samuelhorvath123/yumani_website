@@ -25,11 +25,17 @@ export default function AboutSection() {
     </div>
     <TeamCarousel preview={teamMembers.length === 0}>
       {teamMembers.length ? teamMembers.map(member => <li className="team-card" key={member.name}>
-        <picture className="team-portrait"><img src={member.portrait} alt={member.name} width="840" height="1050" loading="lazy" decoding="async" draggable={false} style={{ objectPosition: member.portraitPosition }}/></picture>
-        <h4>{member.name}</h4><p>{member.role}</p>
+        <div className="team-plate">
+          <span className="team-sheet team-sheet-a" aria-hidden="true"/><span className="team-sheet team-sheet-b" aria-hidden="true"/>
+          <picture className="team-portrait"><img src={member.portrait} alt={member.name} width="840" height="1050" loading="lazy" decoding="async" draggable={false} style={{ objectPosition: member.portraitPosition }}/></picture>
+        </div>
+        <div className="team-caption"><h4>{member.name}</h4><p>{member.role}</p></div>
       </li>) : [1, 2, 3, 4].map(slot => <li className="team-card team-card-preview" key={slot}>
-        <div className="team-portrait"><span className="team-slot-number" aria-hidden="true">0{slot}</span><span className="team-slot-label">Portrait space</span></div>
-        <h4>Team profile</h4><p>Name and role to be added</p>
+        <div className="team-plate">
+          <span className="team-sheet team-sheet-a" aria-hidden="true"/><span className="team-sheet team-sheet-b" aria-hidden="true"/>
+          <div className="team-portrait"><span className="team-slot-art" aria-hidden="true"/><span className="team-slot-number" aria-hidden="true">0{slot}</span><span className="team-slot-label">Portrait space</span></div>
+        </div>
+        <div className="team-caption"><h4>Team profile</h4><p>Name and role to be added</p></div>
       </li>)}
     </TeamCarousel>
     <div className="belief-principles wrap"><span data-reveal="">People before processes</span><span data-reveal="">Reliable before clever</span><span data-reveal="">Honest from the first estimate</span></div>
