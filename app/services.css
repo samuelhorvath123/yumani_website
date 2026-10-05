@@ -78,13 +78,24 @@
 #services .service-icon-surface { fill: oklch(.91 .039 267 / .66); transition: fill 800ms var(--service-ease); }
 #services .service-trigger:is(:hover, [aria-expanded='true']) .service-icon { color: var(--primary); }
 #services .service-trigger[aria-expanded='true'] .service-icon-surface { fill: oklch(.875 .07 266 / .6); }
-#services .service-icon[data-kind='software'] { --trace-time: 600ms; }
-#services .service-icon[data-kind='systems'] { --trace-time: 420ms; }
-#services .service-icon[data-kind='automation'] { --trace-time: 520ms; }
-#services .service-icon[data-kind='solutions'] { --trace-time: 740ms; }
-#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace var(--trace-time) var(--trace-ease) both; }
-/* The short stroke leaves the box only once the two curves have arrived. */
-#services .service-trigger[aria-expanded='true'] .service-icon-trace-late { animation-delay: 340ms; animation-duration: 190ms; }
+#services .service-icon[data-kind='window'] { --trace-time: 600ms; }
+#services .service-icon[data-kind='measure'] { --trace-time: 330ms; }
+#services .service-icon[data-kind='link'] { --trace-time: 520ms; }
+#services .service-icon[data-kind='page'] { --trace-time: 740ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace var(--trace-time, 600ms) var(--trace-ease) both; }
+/* Custom software is measured on two axes at once: an arrowhead, the line across, then the
+   far arrowhead as the line arrives. The pieces overlap a little so it reads as one pen. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-head { animation-duration: 110ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-line { animation-delay: 70ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-tail { animation-delay: 360ms; animation-duration: 110ms; }
+/* Web applications: the title bar crosses in the time the frame takes to reach it. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-bar { animation-duration: 300ms; }
+/* Practical AI: the page's folded corner is drawn when the line reaches it (the pen is
+   78% of the way round at that point, which the curve makes 57% of the time), and the
+   spark arrives last, as the line settles: the pen is nine tenths done at 520ms. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-fold { animation-delay: 420ms; animation-duration: 170ms; }
+#services .service-icon-spark { transform-box: fill-box; transform-origin: center; }
+#services .service-trigger[aria-expanded='true'] .service-icon-spark { animation: yumani-service-pop 240ms cubic-bezier(.2, .8, .2, 1) 600ms both; }
 
 #services .service-toggle {
   position: relative;
@@ -174,6 +185,10 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
+@keyframes yumani-service-pop {
+  from { opacity: 0; transform: scale(.3); }
+  to { opacity: 1; transform: none; }
+}
 
 @media (max-width: 1050px) {
   #services { scroll-margin-top: -95px; }
@@ -214,6 +229,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   #services .service-trigger[aria-expanded='true'] .service-icon-trace { animation: none; stroke-dashoffset: 0; }
+  #services .service-trigger[aria-expanded='true'] .service-icon-spark { animation: none; }
   #services .service-panel { transition: none; }
 }
 
