@@ -474,7 +474,11 @@ h3 { font-weight: 600; }
    where :hover sticks after a tap, simply never sets them. The children are
    dimmed, never the data-reveal row itself: its opacity belongs to the arrival.
    The audience columns are 40px apart, so each row's hit area reaches halfway
-   across the gap and the pointer never falls between two of them. */
+   across the gap and the pointer never falls between two of them. That area is a
+   pseudo-element placed BEHIND the row's text (the row is its own stacking context,
+   the pseudo-element sits at z-index -1): in front of it, it took every click and
+   made the paragraphs impossible to select or copy. It exists only where there is a
+   pointer to hover with. */
 .audience-list { --spot: 0; }
 .audience-list li { position: relative; --on: 0; }
 .audience-list li > * {
@@ -497,13 +501,14 @@ h3 { font-weight: 600; }
   transform-origin: calc((1 - var(--on)) * 100%) 50%;
   transition: transform var(--spot-time) var(--spot-ease);
 }
-.audience-list li::after { content: ''; position: absolute; inset: 0 -20px; }
 @media (hover: hover) and (pointer: fine) {
   .audience-list:has(li:hover) { --spot: 1; }
   .audience-list li:hover { --on: 1; }
+  .audience-list li { isolation: isolate; }
+  .audience-list li::after { content: ''; position: absolute; z-index: -1; inset: 0 -20px; }
 }
 @media (prefers-reduced-motion: reduce) { :root { --spot-slide: 0px; } }
-@media (prefers-contrast: more) { :root { --spot-floor: 0.7; --spot-floor-open: 0.8; } }
+@media (prefers-contrast: more) { :root { --spot-floor: 0.8; --spot-floor-open: 0.9; } }
 /* A button that reads as a link: for actions that stay on the page, such as
    reopening the cookie banner. */
 .link-button { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
@@ -539,7 +544,7 @@ h3 { font-weight: 600; }
   .audience-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
   .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
   .audience-list li { margin-top: 0; }
-  .audience-list li::after { inset: 0 0 -16px; }
+  .audience-list li::after { inset: -16px 0; }
   .audience-list p { max-width: 400px; }
 }
 

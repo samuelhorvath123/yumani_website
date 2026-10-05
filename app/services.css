@@ -8,10 +8,10 @@
   /* The icon draws itself as a service opens: prompt, then steady, then a short clean
      settle (half drawn at 36% of the time, nine tenths at 70%, peak speed 1.6 times the
      average). The first version used the page's expo-out curve, half drawn at 13% and
-     nine tenths at 37%, so it slammed in and was over in about 300ms; the second was
+     nine tenths at 37%, so it slammed in and was over in about 400ms; the second was
      near-linear and took the best part of a second, which was too slow. This sits
      between them. Each icon takes the time its stroke deserves, about 380ms plus 4.5ms
-     for every unit of line (the longest is 81, the shortest 11). */
+     for every unit of line (the longest is 81, the shortest about 8; the strokes of the measuring icon are timed by hand). */
   --trace-ease: cubic-bezier(.3, .25, .5, 1);
   --service-column-gap: 36px;
   --service-icon-size: 52px;
@@ -120,9 +120,11 @@
 #services .service-trigger[aria-expanded='true'] .service-toggle { color: var(--primary); border-color: oklch(.68 .11 264 / .5); background: oklch(.98 .012 260 / .6); }
 #services .service-trigger[aria-expanded='true'] .service-toggle span:last-child { transform: rotate(0deg); opacity: 0; }
 
-/* Spotlight. The row under the pointer (or holding keyboard focus) stays at full
-   strength, the others settle back, the title slides right and a cobalt line
-   draws across the divider. The tokens and the --spot / --on switches are
+/* Spotlight. The row under the pointer stays at full strength, the others settle
+   back, the title slides right and a cobalt line draws across the divider. Keyboard
+   focus gives the focused row the slide and the line but does not dim the others:
+   the dim would last as long as focus rests there, and it takes text below WCAG
+   contrast, which is only acceptable for a moment under a pointer. The tokens and the --spot / --on switches are
    explained with the audience list in globals.css; here the row's header and its
    panel are what dim, because the row itself carries the arrival animation and
    the panel's own opacity belongs to opening and closing. The row's own colour
@@ -130,7 +132,6 @@
 #services .service-list { --spot: 0; }
 #services .service-item { --on: 0; }
 #services .service-item:has(.service-trigger[aria-expanded='true']) { --spot-floor: var(--spot-floor-open); }
-#services .service-list:has(.service-trigger:focus-visible) { --spot: 1; }
 #services .service-item:has(.service-trigger:focus-visible) { --on: 1; }
 @media (hover: hover) and (pointer: fine) {
   #services .service-list:has(.service-item:hover) { --spot: 1; }
