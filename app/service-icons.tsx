@@ -3,7 +3,7 @@ type ServiceKind = 'software' | 'automation' | 'systems' | 'solutions';
 /** Open contours and detached points echo Yumani’s ribbon and background grid. */
 export default function ServiceIcon({ kind }: { kind: ServiceKind }) {
   return (
-    <svg className="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg className="service-icon" data-kind={kind} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       {kind === 'software' && <>
         <path className="service-icon-surface" d="M14 10h8v7h-5v7h-7V14a4 4 0 0 1 4-4Z" stroke="none"/>
         <path d="M22 10h-8a4 4 0 0 0-4 4v16a4 4 0 0 0 4 4h4V24h2"/>

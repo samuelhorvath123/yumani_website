@@ -5,6 +5,13 @@
   /* How long a service takes to open. 650ms felt like waiting; this is the same
      curve at about 70% of the time. */
   --service-open: 460ms;
+  /* The icon draws itself as a service opens, at a steady pen speed: a near-linear curve
+     with a short ramp at each end (peak speed 1.3 times the average). The earlier
+     expo-out curve peaked at 4.5 times the average and had drawn 90% of every stroke by
+     37% of the time, so it was over in about 300ms and the rest was a tail nobody could
+     see. Each icon takes the time its stroke deserves, about 500ms plus 8ms for every
+     unit of line (the longest is 81, the shortest 11), so a long stroke is not rushed. */
+  --trace-ease: cubic-bezier(.3, .1, .7, .9);
   --service-column-gap: 36px;
   --service-icon-size: 52px;
   --service-drift: clamp(0px, 6.6vw, 96px);
@@ -70,8 +77,13 @@
 #services .service-icon-surface { fill: oklch(.91 .039 267 / .66); transition: fill 800ms var(--service-ease); }
 #services .service-trigger:is(:hover, [aria-expanded='true']) .service-icon { color: var(--primary); }
 #services .service-trigger[aria-expanded='true'] .service-icon-surface { fill: oklch(.875 .07 266 / .6); }
-#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace 800ms var(--service-ease) both; }
-#services .service-trigger[aria-expanded='true'] .service-icon-trace-late { animation-delay: 140ms; }
+#services .service-icon[data-kind='software'] { --trace-time: 920ms; }
+#services .service-icon[data-kind='systems'] { --trace-time: 600ms; }
+#services .service-icon[data-kind='automation'] { --trace-time: 760ms; }
+#services .service-icon[data-kind='solutions'] { --trace-time: 1150ms; }
+#services .service-trigger[aria-expanded='true'] .service-icon-trace { stroke-dasharray: 1 2; animation: yumani-service-trace var(--trace-time) var(--trace-ease) both; }
+/* The short stroke leaves the box only once the two curves have arrived. */
+#services .service-trigger[aria-expanded='true'] .service-icon-trace-late { animation-delay: 520ms; animation-duration: 240ms; }
 
 #services .service-toggle {
   position: relative;
