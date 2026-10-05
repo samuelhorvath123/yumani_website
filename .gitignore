@@ -26,8 +26,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local environment
+# local environment and secrets (the contact survey's email key lives here in dev)
 .env*
+.dev.vars*
 
 # deployment and generated files
 .vercel

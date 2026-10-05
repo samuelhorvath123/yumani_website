@@ -1,0 +1,94 @@
+.nav-actions { display: flex; align-items: center; justify-self: end; flex-shrink: 0; gap: 14px; }
+.site-header:has(.nav-actions) .desktop-nav { margin-left: 0; }
+.nav-actions .nav-contact { white-space: nowrap; }
+.language-switch {
+  --language-inset: 3px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  flex: 0 0 auto;
+  width: 90px;
+  min-width: 0;
+  margin: 0;
+  padding: var(--language-inset);
+  border: 1px solid oklch(.67 .07 260 / .4);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklch, var(--primary) 3%, transparent);
+  transition: border-color 650ms ease;
+}
+.language-switch::before, .language-switch::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: var(--language-inset);
+  bottom: var(--language-inset);
+  left: var(--language-inset);
+  width: calc(50% - var(--language-inset));
+  border-radius: calc(var(--radius-control) - var(--language-inset));
+  pointer-events: none;
+}
+.language-switch::before {
+  background: color-mix(in oklch, var(--primary) 8%, var(--background));
+  transition: transform 560ms cubic-bezier(.22, 1, .36, 1);
+}
+/* The same periwinkle-to-cobalt settling as the neighbouring contact button. */
+.language-switch::after {
+  opacity: 0;
+  background: oklch(.68 .14 280 / .18);
+  transition: opacity 300ms ease, background-color 900ms ease-in-out, transform 560ms cubic-bezier(.22, 1, .36, 1);
+}
+.language-switch[data-language='sk']::before, .language-switch[data-language='sk']::after { transform: translateX(100%); }
+.language-switch button {
+  display: grid;
+  place-items: center;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius-control) - var(--language-inset));
+  background: transparent;
+  font-family: inherit;
+  color: oklch(.57 .1 265);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .035em;
+  transition: color 400ms ease;
+}
+.language-switch button[aria-pressed='true'] { color: var(--primary); }
+.language-switch button:disabled { color: oklch(.57 .09 265); opacity: .75; cursor: default; }
+.language-switch button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.language-switch:has(button:enabled:is(:hover, :focus-visible)) { border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.language-switch:has(button:enabled:is(:hover, :focus-visible))::after { opacity: 1; background-color: color-mix(in oklch, var(--primary) 16%, transparent); }
+.language-switch button:enabled:is(:hover, :focus-visible) { color: oklch(.49 .212 264); }
+
+@media (min-width: 701px) and (max-width: 1050px) {
+  .site-header:has(.nav-actions) { gap: 14px; }
+  .site-header:has(.nav-actions) .desktop-nav { gap: 0; font-size: 12px; }
+  .site-header:has(.nav-actions) .desktop-nav a { padding-inline: 9px; white-space: nowrap; }
+  .nav-actions { gap: 10px; }
+  .nav-actions .nav-contact { gap: 12px; padding-inline: 12px; }
+  .language-switch { width: 78px; }
+}
+@media (max-width: 700px) {
+  .nav-actions { gap: 8px; }
+  .language-switch { --language-inset: 2px; width: 74px; }
+  .language-switch button { min-height: 31px; font-size: 10px; }
+  .site-header .nav-actions .nav-contact { gap: 8px; padding-inline: 10px; }
+}
+@media (max-width: 380px) {
+  .site-header:has(.nav-actions) { column-gap: 9px; }
+  .site-header:has(.nav-actions) .brand-name { font-size: 30px; }
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']):has(.nav-actions) .brand-name { font-size: 25px; }
+  .nav-actions { gap: 6px; }
+  .language-switch { width: 68px; }
+  .site-header .nav-actions .nav-contact { font-size: 11px; gap: 5px; padding-inline: 8px; }
+}
+/* On the narrowest screens the bar cannot hold the wordmark, the switch and the
+   button side by side. The switch goes first: Slovak is not available yet, so
+   there is nothing to switch to. */
+@media (max-width: 339px) {
+  .language-switch { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .language-switch, .language-switch::before, .language-switch::after, .language-switch button { transition: none; }
+}

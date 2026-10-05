@@ -1,0 +1,90 @@
+/* The cookie banner: a small floating card in the lower right, in the same family
+   as the floating navigation bar: the same 16px surface corner, hairline edge and
+   pale cyan-to-periwinkle light, with the same 7px corner on everything inside it
+   that you can act on. Accepting and rejecting share one style on purpose, so
+   neither answer is made to look like the right one. */
+.consent {
+  position: fixed;
+  z-index: 40;
+  right: 20px;
+  bottom: 20px;
+  width: min(440px, calc(100% - 40px));
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  border: 1px solid oklch(0.885 0.03 258 / 0.75);
+  border-radius: var(--radius-surface);
+  background:
+    radial-gradient(60% 90% at 0% 0%, oklch(0.955 0.038 230 / 0.45), transparent 70%),
+    radial-gradient(60% 90% at 100% 100%, oklch(0.94 0.045 278 / 0.5), transparent 70%),
+    oklch(0.995 0.003 255 / 0.97);
+  box-shadow: 0 6px 20px oklch(0.3 0.07 262 / 0.06);
+  animation: consent-arrive 700ms cubic-bezier(0.16, 1, 0.3, 1) 400ms both;
+}
+@keyframes consent-arrive { from { opacity: 0; transform: translate3d(0, 16px, 0); } to { opacity: 1; transform: none; } }
+.consent-title { margin: 0 0 8px; font-size: 17px; font-weight: 600; line-height: 1.35; letter-spacing: -0.02em; }
+.consent-text { margin: 0; font-size: 14px; line-height: 1.65; color: var(--muted-foreground); }
+.consent-text a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.consent-text a:hover { text-decoration-thickness: 2px; }
+
+.consent-options { margin-top: 18px; border-top: 1px solid var(--border); }
+.consent-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: start; padding-block: 14px; border-bottom: 1px solid var(--border); }
+.consent-option label { display: block; font-size: 14px; font-weight: 600; cursor: pointer; }
+.consent-option p { margin: 4px 0 0; font-size: 13px; line-height: 1.6; color: var(--muted-foreground); }
+
+/* The switch speaks the language switch's shape: a 7px track with a thumb set in
+   by 3px, so the thumb's corner is the control corner less the inset. Round pills
+   and circles would add a third corner the page does not otherwise have. */
+.consent-switch {
+  --switch-inset: 3px;
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 28px;
+  margin: 0;
+  border: 1px solid oklch(0.67 0.07 260 / 0.4);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklch, var(--primary) 6%, oklch(0.995 0.003 255));
+  cursor: pointer;
+  transition: background-color 400ms ease, border-color 400ms ease;
+}
+.consent-switch::after {
+  content: '';
+  position: absolute;
+  top: var(--switch-inset);
+  left: var(--switch-inset);
+  width: 20px;
+  height: 20px;
+  border-radius: calc(var(--radius-control) - var(--switch-inset));
+  background: oklch(0.57 0.1 265);
+  transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1), background-color 400ms ease;
+}
+.consent-switch:checked { border-color: var(--primary); background: var(--primary); }
+.consent-switch:checked::after { background: var(--primary-foreground); transform: translateX(18px); }
+.consent-switch:disabled { opacity: 0.6; cursor: default; }
+.consent-switch:enabled:hover { border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.consent-switch:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+.consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+/* The buttons themselves are the site's one button, defined in globals.css. */
+.consent-save { width: 100%; margin-top: 10px; }
+/* Quiet, like the page's inline text links. */
+.consent-customise { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 14px 0 2px; border: 0; background: none; color: var(--foreground); font-size: 12px; font-weight: 600; cursor: pointer; transition: color 300ms ease; }
+.consent-customise:is(:hover, :focus-visible) { color: var(--primary); }
+.consent-customise svg { transition: transform 300ms ease; }
+.consent-customise[aria-expanded='true'] svg { transform: rotate(180deg); }
+
+@media (max-width: 700px) {
+  .consent { left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: auto; max-height: calc(100svh - 24px); padding: 20px; }
+  .consent-title { font-size: 16px; }
+}
+@media (prefers-contrast: more) {
+  .consent { border-color: var(--foreground); }
+  .consent-button, .consent-switch { border-color: var(--foreground); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .consent-button, .consent-button::before, .consent-switch, .consent-switch::after, .consent-customise svg { transition: none; }
+}
+@media print { .consent { display: none; } }

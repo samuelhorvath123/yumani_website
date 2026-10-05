@@ -1,0 +1,21 @@
+# Cache content-hashed build assets immutably.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Self-hosted fonts and artwork are stable; revalidate weekly. The names carry
+# no hash, so the fresh window stays short, but a stale copy is still used
+# instantly for a month while the new one is fetched in the background.
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+# Baseline security headers for every response.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  X-Frame-Options: SAMEORIGIN
+  Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin

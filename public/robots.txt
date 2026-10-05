@@ -1,0 +1,5 @@
+# Everything here is meant to be read, by people and by machines.
+User-agent: *
+Allow: /
+
+Sitemap: https://yumaniautomation.com/sitemap.xml

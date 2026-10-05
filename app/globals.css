@@ -1,20 +1,13 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import 'tailwindcss' source(none);
+
+/* Tailwind supplies the reset and sr-only; everything else is written by hand
+   below. Nothing is scanned: scanning picked up ordinary words in the code as
+   class names (hidden, blur, filter, start, end) and shipped them as utilities.
+   The one utility the markup uses is listed instead. */
+@source inline('sr-only');
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: 'Manrope', Arial, sans-serif;
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-ring: var(--primary);
-  --radius-lg: 0.75rem;
+  --font-sans: 'Manrope', 'Manrope Fallback', Arial, sans-serif;
 }
 
 :root {
@@ -23,188 +16,560 @@
   --foreground: oklch(0.29 0.07 260);
   --primary: oklch(0.55 0.206 264);
   --primary-foreground: oklch(0.987 0.006 255);
-  --muted: oklch(0.955 0.015 258);
   --muted-foreground: oklch(0.485 0.035 260);
-  --accent: oklch(0.94 0.028 256);
   --border: oklch(0.88 0.026 258);
+  --mesh-size: clamp(104px, 9vw, 144px);
+  /* Two corners for the whole page: one for anything you can act on, one for the
+     surfaces that float above it. */
+  --radius-control: 7px;
+  --radius-surface: 16px;
+  /* Section headings that carry structure sit quieter than the statements. */
+  --heading-quiet: oklch(0.45 0.045 262);
+  /* The navigation bar converging as it becomes the floating bar: one duration
+     and one curve for every part that moves, plus a beat of delay so the pull-in
+     happens after the bar has faded in and can be seen. */
+  --morph: 780ms;
+  --morph-curve: cubic-bezier(0.3, 0.7, 0.2, 1);
+  --morph-beat: 80ms;
+  /* Used only where a number or an identifier should read as a number or an
+     identifier: step numbers and the register figures. Never for prose. */
+  --font-figure: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Arrival: one dial for how slowly content rises into place, and how deep it
+     starts. Slower reads better than shorter here, so the tail of the curve is
+     where most of the time goes. */
+  --rise: 2640ms;
+  --rise-depth: 56px;
+  --rise-stagger: 270ms;
+  --rise-hero: 2100ms;
+  --rise-hero-body: 2400ms;
+  --rise-hero-actions: 2580ms;
+  --rise-hero-step: 270ms;
+  --rise-hero-depth: 44px;
+  --rise-art: 3750ms;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 35px; }
-body { margin: 0; background: var(--background); color: var(--foreground); font-family: 'Manrope', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+html { --sticky-clearance: 124px; scroll-behavior: smooth; scroll-padding-top: var(--sticky-clearance); }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: 'Manrope', 'Manrope Fallback', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
 button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 button { font-family: inherit; }
 ::selection { background: oklch(0.86 0.08 258); }
 :focus-visible { outline: 3px solid var(--primary); outline-offset: 6px; }
 .wrap { width: min(1280px, calc(100% - 112px)); margin-inline: auto; }
-.opening { position: relative; overflow: hidden; background: linear-gradient(135deg, oklch(0.984 0.009 250), oklch(0.948 0.03 256) 64%, oklch(0.982 0.008 252)); }
-.opening::before { content: ''; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(oklch(0.65 0.05 258 / 0.055) 1px, transparent 1px), linear-gradient(90deg, oklch(0.65 0.05 258 / 0.055) 1px, transparent 1px); background-size: 120px 120px; mask-image: linear-gradient(to bottom, black, transparent 90%); }
-.site-header { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; min-height: 112px; gap: 30px; }
-.brand { display: inline-flex; gap: 9px; align-items: center; color: var(--primary); }
-.brand svg { width: 37px; height: 40px; }
-.brand-name { font-size: 33px; line-height: 0.92; font-weight: 750; letter-spacing: -1.6px; }
-.brand-descriptor { display: block; font-size: 9px; line-height: 1.6; font-weight: 650; letter-spacing: 2.4px; margin-top: 5px; margin-left: 3px; }
-.desktop-nav { display: flex; gap: 34px; font-size: 13px; font-weight: 550; margin-left: 110px; }
-.desktop-nav a { transition: color 180ms ease; padding-block: 12px; }
-.desktop-nav a:hover { color: var(--primary); }
-.nav-contact { display: inline-flex; align-items: center; gap: 22px; border: 1px solid oklch(0.67 0.07 260 / 0.4); padding: 12px 18px; border-radius: 7px; font-size: 13px; font-weight: 650; transition: background 180ms ease, border-color 180ms ease; }
-.nav-contact:hover { background: var(--accent); border-color: var(--primary); }
-.hero { position: relative; min-height: 640px; display: flex; align-items: center; padding-block: 54px 120px; }
-.hero-copy { position: relative; z-index: 2; width: 650px; }
-.eyebrow { display: flex; align-items: center; gap: 9px; color: var(--primary); font-size: 12px; font-weight: 650; margin: 0 0 31px; }
-.little-spark { font-size: 20px; line-height: 1; }
-h1 { font-size: clamp(54px, 5.75vw, 83px); line-height: 1.09; letter-spacing: -4.4px; font-weight: 500; margin: 0; }
-h1 span { color: var(--primary); }
-.hero-description { font-size: 16px; line-height: 1.85; color: var(--muted-foreground); margin: 27px 0 30px; max-width: 465px; font-weight: 450; }
-.hero-actions { display: flex; gap: 30px; align-items: center; }
-.primary-link { display: inline-flex; justify-content: center; align-items: center; gap: 26px; background: var(--primary); color: var(--primary-foreground); border-radius: 7px; padding: 16px 21px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px oklch(0.55 0.206 264 / 0.1); transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease; }
-.primary-link:hover { background: oklch(0.49 0.205 264); transform: translateY(-2px); box-shadow: 0 7px 20px oklch(0.55 0.206 264 / 0.18); }
-.text-link { display: inline-flex; align-items: center; gap: 11px; font-size: 12px; font-weight: 600; padding-block: 12px; }
-.text-link:hover { color: var(--primary); }
-.hero-art { position: absolute; z-index: 0; width: 850px; height: 640px; right: -155px; top: -10px; pointer-events: none; mask-image: radial-gradient(ellipse 53% 49% at 58% 50%, black 49%, transparent 100%); }
-.hero-art img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
-.hero-bottom { position: absolute; z-index: 2; bottom: 45px; inset-inline: 0; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--muted-foreground); }
-.art-caption { display: flex; align-items: center; gap: 8px; padding-right: 80px; }
-.art-caption span { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; }
-.audience { position: relative; display: flex; gap: 65px; align-items: center; border-top: 1px solid var(--border); padding-block: 27px 30px; color: var(--muted-foreground); font-size: 12px; }
-.audience p { margin: 0 auto 0 0; font-size: 11px; }
-.audience span { display: inline-flex; align-items: center; gap: 11px; font-weight: 500; }
-.audience svg { color: oklch(0.56 0.055 260); stroke-width: 1.4; }
-.skip-link { position: fixed; z-index: 99; left: 20px; top: -100px; padding: 12px 20px; background: var(--primary); color: var(--primary-foreground); border-radius: 8px; }
+/* Soft morning light. The hero floor is opaque, so the page keeps one bright
+   first moment; the colour itself lives in .bloom, the mesh above it. */
+.opening {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(135deg, oklch(0.981 0.013 250), oklch(0.948 0.033 258) 68%, oklch(0.986 0.011 254));
+}
+/* Wide, low-chroma light rather than decoration: blue, periwinkle and a pale
+   cyan edge, always soft enough to stay behind the words. The field drifts on a
+   long cycle, so the page reads as lit rather than painted. */
+.bloom {
+  position: absolute;
+  z-index: 0;
+  inset: -14% -10%;
+  pointer-events: none;
+  animation: bloom-drift 54s linear infinite alternate;
+}
+/* Drift is translate and light only. A scale here would re-rasterise three
+   section-sized layers on every frame in Safari for a 5% breath nobody can see;
+   the gentle rise and fall in opacity gives the same life for free.
+   The field moves about a pixel a second, yet a continuous animation makes the
+   compositor redraw the whole section on every display refresh, 120 times a
+   second on ProMotion, which was most of the GPU the page used in Safari. So
+   the drift advances in quarter-pixel steps instead: the same ease-in-out
+   (cubic-bezier(0.45, 0, 0.55, 1), sampled every tenth of the way) with each
+   segment given steps in proportion to how far it moves. That is under four
+   redraws a second on average and no visible difference, because nothing about
+   a soft light field changes in a quarter of a pixel. */
+@keyframes bloom-drift {
+  0% { transform: translate3d(-1.200%, 0.900%, 0); opacity: 0.940; animation-timing-function: steps(4, jump-none); }
+  10% { transform: translate3d(-1.149%, 0.861%, 0); opacity: 0.9411; animation-timing-function: steps(12, jump-none); }
+  20% { transform: translate3d(-0.983%, 0.735%, 0); opacity: 0.9445; animation-timing-function: steps(20, jump-none); }
+  30% { transform: translate3d(-0.686%, 0.510%, 0); opacity: 0.9506; animation-timing-function: steps(29, jump-none); }
+  40% { transform: translate3d(-0.261%, 0.188%, 0); opacity: 0.9594; animation-timing-function: steps(35, jump-none); }
+  50% { transform: translate3d(0.250%, -0.200%, 0); opacity: 0.970; animation-timing-function: steps(35, jump-none); }
+  60% { transform: translate3d(0.761%, -0.588%, 0); opacity: 0.9806; animation-timing-function: steps(29, jump-none); }
+  70% { transform: translate3d(1.186%, -0.910%, 0); opacity: 0.9894; animation-timing-function: steps(20, jump-none); }
+  80% { transform: translate3d(1.483%, -1.135%, 0); opacity: 0.9955; animation-timing-function: steps(12, jump-none); }
+  90% { transform: translate3d(1.649%, -1.261%, 0); opacity: 0.9989; animation-timing-function: steps(4, jump-none); }
+  100% { transform: translate3d(1.700%, -1.300%, 0); opacity: 1; }
+}
+.opening .bloom {
+  background:
+    radial-gradient(52% 50% at 36% 34%, oklch(0.99 0.008 255 / 0.78), transparent 64%),
+    radial-gradient(66% 62% at 13% 62%, oklch(0.885 0.072 253 / 0.66), transparent 72%),
+    radial-gradient(60% 58% at 79% 14%, oklch(0.89 0.07 279 / 0.6), transparent 70%),
+    radial-gradient(56% 52% at 93% 76%, oklch(0.92 0.055 221 / 0.6), transparent 68%);
+}
+.services-atmosphere .bloom {
+  background:
+    radial-gradient(62% 54% at 17% 42%, oklch(0.9 0.062 255 / 0.64), transparent 70%),
+    radial-gradient(60% 54% at 82% 52%, oklch(0.92 0.055 226 / 0.66), transparent 68%),
+    radial-gradient(58% 50% at 42% 66%, oklch(0.92 0.056 277 / 0.54), transparent 68%);
+}
+/* Each tile has four interrupted line segments and one detached center dot. The
+   mesh sits just above the colour field and stays quiet enough to read as paper. */
+.opening::before, .services-atmosphere::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background-image: url('/images/yumani-grid.svg');
+  background-size: var(--mesh-size) var(--mesh-size);
+  background-position: center 40px;
+}
+.opening::before { mask-image: linear-gradient(180deg, black, black 48%, transparent 96%); }
+/* Fade both the blue atmosphere and the ribbon into the next section. */
+.opening::after { content: ''; position: absolute; z-index: 3; inset-inline: 0; bottom: -1px; height: clamp(150px, 17vw, 240px); pointer-events: none; background: linear-gradient(to bottom, color-mix(in oklch, var(--background) 0%, transparent) 0%, color-mix(in oklch, var(--background) 18%, transparent) 24%, color-mix(in oklch, var(--background) 62%, transparent) 58%, color-mix(in oklch, var(--background) 92%, transparent) 82%, var(--background) 100%); }
+.site-header {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 112px;
+  gap: 30px;
+  transition:
+    top var(--morph) var(--morph-curve) var(--morph-beat),
+    width var(--morph) var(--morph-curve) var(--morph-beat),
+    min-height var(--morph) var(--morph-curve) var(--morph-beat),
+    padding var(--morph) var(--morph-curve) var(--morph-beat);
+}
+.brand { display: inline-flex; align-items: center; color: var(--primary); padding-block: 2px; transition: color 420ms ease; }
+.brand-name { position: relative; font-size: 39px; line-height: 0.92; font-weight: 800; letter-spacing: -1.8px; transition: font-size var(--morph) var(--morph-curve) var(--morph-beat), letter-spacing var(--morph) var(--morph-curve) var(--morph-beat); }
+/* "automation" waits in a clipped slot beneath the wordmark, then rises into it on hover or keyboard focus. */
+.brand-descriptor { position: absolute; left: 3px; top: calc(100% + 6px); display: block; overflow: hidden; font-size: 10px; line-height: 1.6; font-weight: 700; letter-spacing: 2.8px; transition: top var(--morph) var(--morph-curve) var(--morph-beat), font-size var(--morph) var(--morph-curve) var(--morph-beat); }
+.brand-descriptor-word { display: block; color: oklch(0.68 0.14 280); opacity: 0; transform: translate3d(0, 108%, 0); filter: blur(2.5px); transition: transform 340ms cubic-bezier(0.4, 0, 0.6, 1), opacity 260ms ease-in, filter 300ms ease-in, color 460ms ease-out; }
+.brand:hover, .brand:focus-visible { color: oklch(0.49 0.212 264); }
+.brand:hover .brand-descriptor-word, .brand:focus-visible .brand-descriptor-word { color: var(--primary); opacity: 1; transform: translate3d(0, 0, 0); filter: none; transition: transform 640ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 420ms ease-out, filter 560ms ease-out, color 820ms ease-in-out; }
+@media (prefers-reduced-motion: reduce) {
+  .brand-descriptor-word { transform: none; filter: none; transition: opacity 140ms linear, color 140ms linear; }
+  .brand:hover .brand-descriptor-word, .brand:focus-visible .brand-descriptor-word { transform: none; filter: none; }
+}
+.desktop-nav { display: flex; gap: 4px; font-size: 13px; font-weight: 600; margin-left: 96px; transition: margin-left var(--morph) var(--morph-curve) var(--morph-beat); }
+/* Each link is a quiet chip. The tint is the brand's own cobalt let down to a
+   wash, so one rule reads correctly on the pale hero and on the bar's tinted
+   surface alike. The section you are reading keeps the same wash at half
+   strength, in place: the mark is a state, never a thing that travels, which
+   matters because the bar and the page are deliberately in different orders. */
+.desktop-nav a { padding: 8px 14px; border-radius: var(--radius-control); transition: color 380ms ease, background-color 380ms ease; }
+.desktop-nav a[aria-current] { background-color: color-mix(in oklab, var(--primary) 6%, transparent); }
+.desktop-nav a:is(:hover, :focus-visible) { color: var(--primary); background-color: color-mix(in oklab, var(--primary) 11%, transparent); }
+.nav-contact { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; min-height: 44px; gap: 22px; border: 1px solid oklch(0.67 0.07 260 / 0.4); padding: 12px 18px; border-radius: var(--radius-control); font-size: 13px; font-weight: 700; transition: color 450ms ease, border-color 450ms ease, min-height var(--morph) var(--morph-curve) var(--morph-beat), padding var(--morph) var(--morph-curve) var(--morph-beat), gap var(--morph) var(--morph-curve) var(--morph-beat), background-color var(--morph) var(--morph-curve) var(--morph-beat); }
+/* Echo the heading's periwinkle-to-blue settling and gentle upward motion. */
+.nav-contact::before { content: ''; position: absolute; z-index: -1; inset: 0; border-radius: inherit; pointer-events: none; background-color: oklch(0.68 0.14 280 / 0.15); opacity: 0; transition: opacity 320ms ease, background-color 900ms ease-in-out; }
+.nav-contact > svg { flex-shrink: 0; transform: translate3d(0, 0, 0); transition: transform 650ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.nav-contact:hover, .nav-contact:focus-visible { color: var(--primary); border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.nav-contact:hover::before, .nav-contact:focus-visible::before { opacity: 1; background-color: color-mix(in oklch, var(--primary) 10%, transparent); }
+.nav-contact:hover > svg, .nav-contact:focus-visible > svg { transform: translate3d(2px, -2px, 0); }
+@media (prefers-reduced-motion: reduce) { .nav-contact > svg { transform: none !important; } }
+.hero { position: relative; min-height: 660px; display: flex; align-items: center; padding-block: 128px 56px; }
+.hero-copy { position: relative; z-index: 4; width: 760px; max-width: 100%; }
+.hero-headline { position: relative; width: fit-content; max-width: 100%; font-size: clamp(50px, 5.85vw, 78px); }
+h1 { font-size: inherit; line-height: 1.08; letter-spacing: -0.052em; font-weight: 500; margin: 0; }
+.rotator { position: relative; display: grid; width: max-content; max-width: 100%; height: 1.4em; margin-block: -0.155em; overflow: hidden; color: var(--primary); perspective: 900px; }
+.rotator-measure, .rotator-current { grid-area: 1 / 1; line-height: 1.4em; white-space: nowrap; }
+.rotator-measure { visibility: hidden; pointer-events: none; }
+.rotator-current { position: relative; justify-self: start; }
+.rotator-word { display: block; line-height: 1.4em; white-space: nowrap; }
+.rotator-letter { display: inline-block; transform-origin: 50% 85%; }
+.rotator-word-in .rotator-letter { animation: letter-unfold var(--letter-enter) cubic-bezier(0.22, 0.61, 0.36, 1) both, letter-tint var(--letter-enter) ease-in-out both; animation-delay: calc(var(--letter-delay) + var(--letter-index) * var(--letter-stagger)); }
+.rotator-word-out { position: absolute; left: 0; top: 0; pointer-events: none; animation: word-release var(--word-exit) cubic-bezier(0.4, 0, 0.6, 1) both; transform-origin: 50% 20%; }
+@keyframes letter-unfold {
+  from { opacity: 0; transform: perspective(450px) translate3d(0.035em, 0.48em, 0) rotateX(-38deg); }
+  to { opacity: 1; transform: perspective(450px) translate3d(0, 0, 0) rotateX(0); }
+}
+/* Each letter arrives periwinkle, oklch(0.68 0.14 280), passes through
+   oklch(0.61 0.18 270) and settles into the cobalt. The shift is a filter on
+   the cobalt letter rather than an animated colour: colour can only be animated
+   by repainting each letter on every frame on the main thread, which Safari
+   halves in Low Power Mode, while a filter animates on the compositor. The
+   settings were solved from the Filter Effects colour matrices to land on both
+   tints within a tenth of a level (Chrome renders them exactly, WebKit within
+   four levels), and the path between them stays within three levels of the
+   colour animation it replaces. */
+@keyframes letter-tint {
+  0%, 15% { filter: hue-rotate(14.3deg) saturate(0.429) brightness(1.481); }
+  55% { filter: hue-rotate(6.5deg) saturate(0.694) brightness(1.227); }
+  100% { filter: hue-rotate(0deg) saturate(1) brightness(1); }
+}
+@keyframes word-release {
+  from { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0); }
+  to { opacity: 0; transform: translate3d(0.025em, -0.22em, 0) rotateX(12deg); }
+}
+@media (prefers-reduced-motion: reduce) { .rotator-word-out { display: none; } }
+.hero-description { font-size: 18px; line-height: 1.65; color: var(--muted-foreground); margin: 32px 0 34px; max-width: 520px; font-weight: 500; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; }
+/* One action language for the whole page: a solid cobalt button, or a quiet link.
+   Nothing lifts on hover; the surface settles and the arrow does the pointing. */
+/* One button for the whole site, and it is the Let's talk button: a white surface,
+   a hairline, the 7px corner, and the periwinkle wash that settles into cobalt on
+   hover, with the label and the arrow turning cobalt together. The hero, the
+   closing invitation, the contact survey and the cookie banner all wear it; only
+   the size differs, so they are defined once and can never drift apart. */
+.primary-link, .consent-button, .legal-menu summary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid oklch(0.67 0.07 260 / 0.4);
+  border-radius: var(--radius-control);
+  background-color: oklch(0.995 0.003 256 / 0.75);
+  color: var(--foreground);
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 450ms ease, border-color 450ms ease;
+}
+.primary-link::before, .consent-button::before, .legal-menu summary::before { content: ''; position: absolute; z-index: -1; inset: 0; border-radius: inherit; pointer-events: none; background-color: oklch(0.68 0.14 280 / 0.15); opacity: 0; transition: opacity 320ms ease, background-color 900ms ease-in-out; }
+.primary-link:is(:hover, :focus-visible), .consent-button:is(:hover, :focus-visible), .legal-menu[open] summary, .legal-menu summary:is(:hover, :focus-visible) { color: var(--primary); border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.primary-link:is(:hover, :focus-visible)::before, .consent-button:is(:hover, :focus-visible)::before, .legal-menu[open] summary::before, .legal-menu summary:is(:hover, :focus-visible)::before { opacity: 1; background-color: color-mix(in oklch, var(--primary) 10%, transparent); }
+/* The main action keeps that language (the hairline, the corner, the wash on hover)
+   but speaks it in the logo's cobalt: the label, the arrow and the edge are the
+   wordmark's own colour. The surface is mostly see-through, so the hero shows
+   through and the button does not glare; 60% is the least that keeps the label at
+   4.5:1 even over the darkest part of the hero's blue on a phone. On hover the
+   label takes the darker shade the wordmark takes. */
+.primary-link {
+  gap: 14px;
+  min-height: 54px;
+  padding: 0 22px;
+  font-size: 14px;
+  border-color: color-mix(in oklch, var(--primary) 45%, transparent);
+  background-color: color-mix(in oklch, var(--primary) 3%, oklch(0.995 0.003 256 / 0.6));
+  color: var(--primary);
+}
+.primary-link:is(:hover, :focus-visible) { color: oklch(0.49 0.212 264); border-color: var(--primary); }
+.consent-button, .legal-menu summary { min-height: 44px; padding: 0 18px; font-size: 13px; }
+.legal-menu summary { gap: 14px; list-style: none; }
+@media (prefers-contrast: more) { .primary-link, .consent-button, .legal-menu summary { border-color: var(--foreground); } }
+.text-link { display: inline-flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 600; padding-block: 15px; transition: color 300ms ease; }
+.text-link:is(:hover, :focus-visible) { color: var(--primary); }
+/* The hero pair shares one height and one label size; only the first is a
+   surface, so the hero makes a single shape instead of two competing boxes. */
+.hero-actions > a { display: inline-flex; align-items: center; justify-content: center; min-height: 54px; max-width: 100%; font-size: 14px; line-height: 1.45; font-weight: 600; }
+.hero-actions > .primary-link { font-weight: 700; }
+.hero-actions > a > svg { flex-shrink: 0; transition: transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.hero-actions > .primary-link:is(:hover, :focus-visible) > svg { transform: translate(2px, -2px); }
+.hero-actions > .text-link:is(:hover, :focus-visible) > svg { transform: translateY(2px); }
+@media (max-width: 700px) {
+  .hero-actions { gap: 6px 20px; }
+  .hero-actions > a { min-height: 50px; }
+  .hero-actions > .primary-link { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-actions > a > svg { transform: none !important; }
+}
+.hero-art { position: absolute; z-index: 2; width: min(76vw, 1040px); aspect-ratio: 3 / 2; right: clamp(-104px, -5vw, -32px); top: 50%; translate: 0 -50%; pointer-events: none; mask-image: linear-gradient(90deg, transparent, black 23%, black); }
+.hero-flow-sculpture { position: relative; width: 100%; height: 100%; }
+.hero-art picture { display: block; width: 100%; height: 100%; }
+.hero-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* The travelling light never repaints: its discs move on compositor-only
+   transform keyframes (lib/flow-light.ts), each stroke is blurred on its own
+   layer, and the wrapper's mask keeps the light on the ribbon. The canvas is
+   laid out in artwork units (1536 x 1024) and scaled to the artwork, so the
+   keyframes, the disc sizes and the blur (the old SVG stdDeviation of 14) all
+   stay in those units. The hero sets the scale and reveals the light once the
+   mask has decoded. */
+.hero-flow-light { position: absolute; inset: 0; pointer-events: none; visibility: hidden; mask-repeat: no-repeat; mask-position: center; mask-size: 100% 100%; }
+.hero-experience[data-light='ready'] .hero-flow-light { visibility: visible; mask-image: url('/images/yumani-flow-light-mask.avif'); }
+.hero-flow-canvas { position: absolute; left: 0; top: 0; width: 1536px; height: 1024px; transform-origin: 0 0; transform: scale(var(--flow-scale, 0.677)); }
+.hero-flow-stroke { position: absolute; opacity: 0; filter: blur(14px); will-change: opacity; }
+.hero-flow-disc { position: absolute; left: 0; top: 0; width: var(--disc-size); height: var(--disc-size); border-radius: 50%; background: currentColor; opacity: 0; will-change: transform, opacity; }
+.hero-experience[data-reduced-motion='true'] .hero-flow-light { display: none; }
+@media (prefers-reduced-motion: reduce) { .hero-flow-light { display: none; } }
+.not-found { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; padding-block: 96px 56px; }
+.not-found-code { margin: 0; font-size: 13px; font-weight: 700; color: var(--muted-foreground); }
+.not-found-title { font-size: clamp(40px, 5vw, 64px); }
+.not-found-copy { margin: 0; max-width: 460px; font-size: 17px; line-height: 1.7; color: var(--muted-foreground); }
+.not-found .primary-link { margin-top: 8px; }
+.not-found-legal { margin: 32px 0 0; font-size: 12px; line-height: 1.7; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.skip-link { position: fixed; z-index: 99; left: 20px; top: -100px; padding: 12px 20px; background: var(--primary); color: var(--primary-foreground); border-radius: var(--radius-control); }
 .skip-link:focus { top: 20px; }
-@media (min-width: 1650px) { .hero { min-height: 710px; } .hero-art { width: 960px; height: 720px; right: -175px; } }
-@media (max-width: 1050px) { .wrap { width: calc(100% - 64px); } .desktop-nav { margin-left: 0; gap: 24px; } .hero-art { right: -265px; opacity: 0.76; } .hero-copy { width: 600px; } h1 { letter-spacing: -3px; } .audience { gap: 30px; } .art-caption { padding-right: 0; } }
-@media (max-width: 700px) { .wrap { width: calc(100% - 40px); } .site-header { min-height: 90px; gap: 16px; } .brand-name { font-size: 29px; } .brand svg { width: 32px; } .desktop-nav { display: none; } .nav-contact { padding: 11px 14px; gap: 13px; font-size: 12px; } .hero { align-items: flex-start; min-height: 790px; padding-block: 48px 310px; } .hero-copy { width: 100%; } .eyebrow { font-size: 11px; margin-bottom: 26px; } h1 { font-size: clamp(48px, 10.5vw, 70px); letter-spacing: -2.9px; } .hero-description { font-size: 14px; line-height: 1.85; margin-block: 24px 27px; max-width: 370px; } .desktop-break { display: none; } .hero-actions { gap: 20px; flex-wrap: wrap; } .primary-link { font-size: 12px; padding: 15px 18px; gap: 18px; } .text-link { font-size: 11px; gap: 7px; } .hero-art { top: auto; bottom: 15px; height: 370px; width: 570px; right: -100px; opacity: 1; mask-image: radial-gradient(ellipse 53% 46% at 55% 54%, black 43%, transparent 100%); } .hero-bottom { bottom: 24px; font-size: 9px; } .art-caption { display: none; } .audience { flex-wrap: wrap; gap: 22px 25px; padding-block: 25px; font-size: 11px; } .audience p { width: 100%; } .audience span { gap: 7px; } .audience svg { width: 15px; } }
+@media (min-width: 1650px) { .hero { min-height: 710px; } }
+@media (max-width: 1050px) { .wrap { width: calc(100% - 64px); } .desktop-nav { margin-left: 0; gap: 24px; } .hero-copy { width: 640px; } }
+/* Just above the phone layout the bar is at its tightest, and the converged
+   sliver has less room inside it than the header it came from. The row gives up
+   the slack in its gaps rather than in the words, and a label never splits over
+   two lines, which is what made the bar grow taller the narrower it got. */
+@media (max-width: 760px) {
+  .desktop-nav { gap: 16px; }
+  .desktop-nav a { white-space: nowrap; }
+}
+/* On small screens the artwork keeps the composition it has on a wide one: the
+   loop of the ribbon at the right edge, the strands running left behind the
+   headline and fading out before they reach the words. It is scaled up past the
+   screen's edge so the loop stays a good size, and it is never turned on its
+   side: rotated, the ribbon stopped reading as a ribbon. The travelling light
+   follows the ribbon as before, because it is laid out in the artwork's own units. */
+@media (max-width: 900px) {
+  .hero { flex-direction: column; align-items: flex-start; min-height: 0; gap: 0; padding-block: 72px 32px; }
+  .hero-art {
+    /* About 560px on a phone and 690px at the 900px breakpoint, where the wide
+       layout takes over at 76% of the window: the loop grows gently, not wildly. */
+    width: calc(25.5vw + 460px);
+    right: clamp(-90px, -9vw, -50px);
+    top: 0;
+    translate: none;
+    mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 30%, black 62%), linear-gradient(180deg, black 60%, transparent 96%);
+    mask-composite: intersect;
+  }
+  .hero-flow-sculpture { opacity: 0.8; }
+  .opening::after { height: 112px; }
+}
+@media (max-width: 700px) { .wrap { width: calc(100% - 40px); } .site-header { min-height: 90px; gap: 16px; } .brand-name { font-size: 34px; } .desktop-nav { display: none; } .nav-contact { padding: 11px 14px; gap: 13px; font-size: 12px; } .hero-copy { width: 100%; } .hero-headline { font-size: clamp(40px, 11.8vw, 52px); } h1 { letter-spacing: -0.035em; } .hero-description { font-size: 16px; line-height: 1.7; margin-block: 26px 28px; max-width: 400px; } .primary-link { font-size: 13px; padding: 0 18px; gap: 18px; } .text-link { font-size: 11px; gap: 7px; } }
+@media (prefers-contrast: more) {
+  :root { --heading-quiet: oklch(0.36 0.05 262); --muted-foreground: oklch(0.42 0.04 260); --border: oklch(0.78 0.03 258); }
+}
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/manrope-400.ttf') format('truetype'); }
-@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/manrope-500.ttf') format('truetype'); }
-@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/manrope-600.ttf') format('truetype'); }
-@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/manrope-700.ttf') format('truetype'); }
-@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 800; font-display: swap; src: url('/fonts/manrope-800.ttf') format('truetype'); }
-.site-header { position: absolute; left: 50%; transform: translateX(-50%); top: 0; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/manrope-400.woff2') format('woff2'); }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/manrope-500.woff2') format('woff2'); }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/manrope-600.woff2') format('woff2'); }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/manrope-700.woff2') format('woff2'); }
+/* Weight 800 is the wordmark and nothing else, so only its six letters are shipped,
+   and inside this stylesheet rather than as a file: the logo's font is there at
+   the very first paint, on every page and every navigation, with no request to
+   wait for. A file would show the logo in Arial until it arrived (swap) or leave
+   it missing until then (block), and both are visible. The letters are the
+   original 800 outlines, spacing and kerning, cut with
+     pyftsubset manrope-800.woff2 --text=yumani --flavor=woff2 --layout-features='*' --no-hinting --desubroutinize
+   from design/source/manrope-800.woff2. Anything else set in 800 falls back to 700. */
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 800; font-display: block; unicode-range: U+0061, U+0069, U+006D, U+006E, U+0075, U+0079; src: url(data:font/woff2;base64,d09GMgABAAAAAASAAA4AAAAACGgAAAQmAASBBgAAAAAAAAAAAAAAAAAAAAAAAAAAG4FCHIFUBmA/U1RBVCoAVBEICoRYhBMBNgIkAyALEgAEIAWDVAcgGxwHSB4J5ebK3GEV8/XR4IH+T/szc+cmLtMFs3YB7W4BBEW6gp/o4IEfP2QK4D/FFSH+/3unf80Gldej/8UCCjihPeiej1HbF42l3xJK0z7XBpkUplGAn6gBgFk31L7KkH0m7eT2kmTsN0MAFuYSj5adW1yBo33jkAuHq9XnwYECCIcRgOjvHPJgAgQgUEhMCExIilFAFX3oGFC98KtY51OoWyIQGKEGgTzUCgVoK5BoaOjoCNQW3ut4lJzETsXZAkDPqMtxMjVrTYWTuUUPZSdLKzK8M7FiTVE2c+NQTQta0lq7Qnd52104IzmTnE8uVcYDAkVqJKRoSnRsJYTjJsENuDhGotTXmhMddId6EDhXL5TPslQeAHEIuB1r80sKeJFWNpoq/rsTTBWyBhAAKl6/AThRiKl2cDwSTECu7+7xCQCJABBGzQmABDTAgYYAHCjSARsmJIpWevEwwsZwAJT7ZeEbLz7/5GPE0i4RTuTRJgCiABvwIIhowEA+FYBEhqMhkYjpDqViDDFjDGMMltZDwaDYGQpVv3Pfp2Jn0HLIX1EVClkPByofCqAsIsXvrzocCo1/ICQq/X7/8kffvZcdLwU2CzsbzHbTZt1W8lO1M3WiNpmt0qrsvYj3u1y0BpNBPhr8qqGiLnAfCrqy0O1yRydnPcz8uZCo3OH3V2sW3W7qbK7cZN9o2Wzf8MRE342aNWfqihZs7mqqmvzYbVM+mrQ1pnVFS32tK3lnwtiC30pm7/3ujleOf1Ud3/+PdX3hme+/nljqerxldaCoa3ly1u1FBt+sstgNsWfH1cfN3676x8/IzhqPRb3/Yz9Gq/fjo+Kpg239HetqE9YuX9iUOljk7bnrwSbXU89+/tDrbS3E/9g19eNN4Q1WdvkaB8v6eu94uNW7/eb+kkdcr+P6f4ZxaM5wU0n1tLK4nNT5GzsvF+zo/ubDg9e3X6+s2T3jmHFkfNPv8T93Tf2YiZPxNMdreVNH/vnJ/HPExBP3zQdJ2h0TO/aMi31laXrsLUujZs4cgzQgIQrgBogH9ecRgNppyB99Y0tzZPJvJs34IcAXj9++B+Cryauv/++/za+aLwMGJAAC/nzOkkxw/5uBQJeb9Dd5Ux2jXJZz41QYZ3NI/WmmDcqHAwGY6MBOLYYRrRoCMDPUdCkzcAMSEkzlBpJE8DLSiOfDccUhnXHC5DYwVUxVCbCJ7BMJIzGinCy8DLCRIXrppgcfTpaymCUk4KQC4p3lElrxOD8fRMnyFu9LtpvKGYzgk7KXIYbFPpse8DEQIZFFReumlyqP0MZCo7EXN4sYpodWhiZAB61w0j1t+pzp1Rw24DPFM7Gxiw7W0Ek3I7iGmWs5C1nBYpaTxFryKaGApEGeFmBVwfXn9eLFgzMPaserIx/YgyhqqK/wFUsBAAAA) format('woff2'); }
+/* Arial, resized to Manrope's proportions for each weight, stands in until the
+   web font arrives, so the swap does not rewrap the headline or move the page.
+   Widths come from a letter-frequency average of both fonts' advance widths;
+   the vertical overrides are Manrope's typo metrics (2132 / 600 on a 2000 em),
+   divided by the size adjustment because the overrides are scaled by it too. */
+@font-face { font-family: 'Manrope Fallback'; font-weight: 100 450; src: local('Arial'), local('ArialMT'); size-adjust: 103.23%; ascent-override: 103.26%; descent-override: 29.06%; line-gap-override: 0%; }
+@font-face { font-family: 'Manrope Fallback'; font-weight: 451 550; src: local('Arial'), local('ArialMT'); size-adjust: 105.04%; ascent-override: 101.49%; descent-override: 28.56%; line-gap-override: 0%; }
+@font-face { font-family: 'Manrope Fallback'; font-weight: 551 650; src: local('Arial Bold'), local('Arial-BoldMT'); size-adjust: 98.84%; ascent-override: 107.86%; descent-override: 30.35%; line-gap-override: 0%; }
+@font-face { font-family: 'Manrope Fallback'; font-weight: 651 750; src: local('Arial Bold'), local('Arial-BoldMT'); size-adjust: 100.48%; ascent-override: 106.09%; descent-override: 29.86%; line-gap-override: 0%; }
+@font-face { font-family: 'Manrope Fallback'; font-weight: 751 900; src: local('Arial Bold'), local('Arial-BoldMT'); size-adjust: 102.16%; ascent-override: 104.35%; descent-override: 29.37%; line-gap-override: 0%; }
 .hero { margin-top: 112px; }
-.hero-copy { animation: arrive 850ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-.hero-art { animation: art-arrive 1500ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-@keyframes arrive { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes art-arrive { from { opacity: 0; transform: translate(16px, 7px) scale(0.97); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
-h2 { font-size: clamp(34px, 3.25vw, 47px); font-weight: 500; line-height: 1.19; letter-spacing: -1.8px; margin: 0; }
-h3 { font-weight: 550; }
-.section-label { font-size: 12px; font-weight: 600; color: var(--primary); margin: 0 0 22px; }
-.services-section { padding-block: 120px 126px; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; }
-.section-intro > p:not(.section-label) { max-width: 365px; margin: 25px 0 23px; color: var(--muted-foreground); font-size: 14px; line-height: 1.9; }
+/* The bar arrives with the copy, on the same curve, but holds perfectly still:
+   only the fade, so the header is simply there rather than moving into place.
+   The fade sits on its contents so the phase animations, which own the header's
+   own opacity, never have to share the property. */
+.site-header > * { animation: nav-arrive var(--rise-hero) cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes nav-arrive { from { opacity: 0; } to { opacity: 1; } }
+/* The hero arrives in one unhurried cascade: headline, then description, then
+   actions, each starting deeper than it settles. */
+.hero-copy { animation: arrive var(--rise-hero) cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-description { animation: arrive var(--rise-hero-body) cubic-bezier(0.16, 1, 0.3, 1) var(--rise-hero-step) both; }
+.hero-actions { animation: arrive var(--rise-hero-actions) cubic-bezier(0.16, 1, 0.3, 1) calc(var(--rise-hero-step) * 2) both; }
+.hero-art { animation: art-arrive var(--rise-art) cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes arrive { from { opacity: 0; transform: translate3d(0, var(--rise-hero-depth), 0); } to { opacity: 1; transform: none; } }
+@keyframes art-arrive { from { opacity: 0; transform: translate3d(48px, 16px, 0) scale(0.94); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
+/* Everything below the hero rises into place once, slowly, as it reaches the
+   viewport. The hidden state is injected by the bootstrap in app/layout.tsx, so
+   the page stays complete without JavaScript, in print and under reduced motion. */
+[data-reveal] { transition: opacity var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms), transform var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms); }
+/* Groups settle in one after another rather than all at once. */
+.service-list .service-item:nth-child(2), .process-list > :nth-child(2), .belief-principles > :nth-child(2), .audience-list > :nth-child(2) { --reveal-delay: var(--rise-stagger); }
+.service-list .service-item:nth-child(3), .process-list > :nth-child(3), .belief-principles > :nth-child(3), .audience-list > :nth-child(3) { --reveal-delay: calc(var(--rise-stagger) * 2); }
+.service-list .service-item:nth-child(4), .belief-principles > :nth-child(4), .audience-list > :nth-child(4) { --reveal-delay: calc(var(--rise-stagger) * 3); }
+h2 { font-size: clamp(34px, 3.25vw, 47px); font-weight: 500; line-height: 1.19; letter-spacing: -0.04em; margin: 0; }
+/* Headings break evenly rather than orphaning a word; paragraphs avoid a
+   single word on their last line. Both degrade silently where unsupported. */
+h1, h2, h3, .rotator { text-wrap: balance; }
+p, li, figcaption, .closing-foot p { text-wrap: pretty; }
+.services-section h2, .approach-section h2, .audience-section h2 { color: var(--heading-quiet); }
+h3 { font-weight: 600; }
+.services-section { position: relative; isolation: isolate; padding-block: 200px; }
+.services-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; }
+/* Only the atmosphere is clipped; content and keyboard focus rings stay free.
+   The colour itself comes from the shared .bloom field inside it. */
+.services-atmosphere {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
+}
+.services-atmosphere::before { opacity: 0.7; mask-image: linear-gradient(180deg, black, black 30%, transparent 92%); }
+.services-ribbon {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  top: clamp(280px, 28vw, 390px);
+  left: 50%;
+  width: calc(100% + 80px);
+  aspect-ratio: 3 / 1;
+  translate: -50% -50%;
+  opacity: 0.34;
+  mask-image: linear-gradient(90deg, black 38%, rgb(0 0 0 / 0.62) 58%), linear-gradient(180deg, transparent, black 20%, black 80%, transparent);
+  mask-composite: intersect;
+}
+.services-ribbon img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .blue-link { color: var(--primary); }
-.small-note { display: flex; align-items: center; gap: 17px; color: var(--muted-foreground); font-size: 11px; line-height: 1.8; margin-top: 65px; }
-.note-line { width: 31px; height: 1px; background: var(--primary); }
 .service-list { border-top: 1px solid var(--border); }
 .service-item { border-bottom: 1px solid var(--border); }
-.service-trigger { padding: 28px 0; gap: 18px; align-items: center; color: var(--foreground); border-radius: 0; }
-.service-trigger:hover { text-decoration: none; color: var(--primary); }
+.service-trigger { color: var(--foreground); }
+.service-trigger:hover { color: var(--primary); }
 .service-trigger[aria-expanded='true'] { color: var(--primary); }
-.service-number { color: var(--muted-foreground); font-size: 10px; font-weight: 500; width: 20px; text-align: left; }
-.service-icon { margin-right: 2px; flex-shrink: 0; }
-.service-title { font-size: 20px; letter-spacing: -0.55px; flex: 1; font-weight: 500; }
-.service-trigger [data-slot='accordion-trigger-icon'] { width: 16px; height: 16px; color: currentColor; }
-.service-content { padding: 0 22px 29px 64px; }
-.service-content p { margin: 0; color: var(--muted-foreground); font-size: 13px; line-height: 1.85; max-width: 420px; }
-.service-tags { display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 22px 0 0; gap: 7px; }
-.service-tags li { font-size: 10px; padding: 6px 9px; background: var(--muted); color: var(--muted-foreground); border-radius: 4px; }
-/* Keep disclosure movement quiet; content remains a standard accessible accordion. */
-.service-list [data-slot='accordion-content'] { animation: none; }
+.service-content p { color: var(--muted-foreground); }
 .belief-section { background: oklch(0.45 0.14 262); color: oklch(0.97 0.01 255); position: relative; overflow: hidden; }
-.belief-inner { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 120px; padding-block: 91px 75px; }
-.belief-heading { position: relative; }
-.belief-symbol { display: inline-block; color: oklch(0.76 0.105 258); font-size: 38px; line-height: 1; margin-bottom: 37px; }
-.belief-section .section-label { color: oklch(0.82 0.058 258); margin-bottom: 19px; }
-.belief-section h2 { font-size: clamp(38px, 3.65vw, 54px); line-height: 1.16; letter-spacing: -2px; }
+/* The one sentence the whole page is built around, so it gets the scale. */
+.belief-section h2 { font-size: clamp(42px, 5.4vw, 78px); line-height: 1.07; letter-spacing: -0.05em; }
 .belief-section h2 span { color: oklch(0.79 0.10 255); }
 .belief-copy { padding-top: 10px; }
-.belief-copy > p { font-size: 13px; color: oklch(0.85 0.035 257); line-height: 1.9; margin: 0 0 18px; max-width: 445px; }
-.belief-copy > .belief-lead { font-size: 23px; letter-spacing: -0.6px; font-weight: 500; line-height: 1.5; color: oklch(0.98 0.008 256); margin-bottom: 24px; }
-.quality-promise { display: flex; gap: 10px; align-items: center; font-size: 11px; font-weight: 500; color: oklch(0.95 0.025 257); margin-top: 29px; }
+.belief-copy > p { font-size: 15px; color: oklch(0.85 0.035 257); line-height: 1.75; margin: 0 0 18px; max-width: 470px; }
+.quality-promise { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 500; color: oklch(0.95 0.025 257); margin-top: 29px; }
 .quality-promise svg { color: oklch(0.79 0.10 255); flex-shrink: 0; }
-.belief-principles { display: flex; justify-content: space-between; gap: 30px; border-top: 1px solid oklch(0.75 0.045 256 / 0.28); padding-block: 26px 29px; font-size: 12px; }
+.belief-principles { display: flex; justify-content: space-between; gap: 30px; border-top: 1px solid oklch(0.75 0.045 256 / 0.28); padding-block: 26px 29px; font-size: 13px; }
 .belief-principles > span { display: flex; gap: 17px; align-items: center; }
-.belief-principles > span > span { font-size: 9px; color: oklch(0.78 0.08 255); }
-.approach-section { padding-block: 120px 127px; }
+.approach-section { padding-block: 200px; }
 .approach-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 100px; }
 .approach-heading > p { font-size: 14px; line-height: 1.9; color: var(--muted-foreground); max-width: 355px; margin: 0 0 4px; }
 .process-list { display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; padding: 0; margin: 67px 0 0; gap: 54px; }
 .process-top { display: flex; justify-content: space-between; align-items: center; padding-block: 0 22px; border-bottom: 1px solid var(--border); color: var(--primary); }
-.process-top > span { font-size: 12px; }
-.process-top svg { stroke-width: 1.3; }
+.process-top > span { font-family: var(--font-figure); font-size: 12px; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
 .process-list h3 { font-size: 20px; line-height: 1.4; letter-spacing: -0.5px; margin: 25px 0 13px; }
-.process-list p { font-size: 13px; line-height: 1.85; color: var(--muted-foreground); max-width: 310px; margin: 0; }
-.contact-section { background: linear-gradient(118deg, oklch(0.947 0.028 259), oklch(0.968 0.02 250)); border-block: 1px solid oklch(0.90 0.024 257); }
-.contact-inner { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 120px; padding-block: 82px 88px; align-items: center; }
-.contact-kicker { font-size: 11px; color: var(--muted-foreground); display: flex; gap: 10px; align-items: center; margin: 0 0 27px; }
-.contact-kicker svg { color: var(--primary); }
-.contact-heading h2 { font-size: clamp(42px, 4vw, 58px); line-height: 1.13; letter-spacing: -2.5px; }
-.contact-heading h2 span { color: var(--primary); }
-.contact-copy > p { font-size: 16px; line-height: 1.85; margin: 0 0 27px; color: var(--muted-foreground); }
-.email-link { display: flex; align-items: center; width: fit-content; gap: 7px; font-size: 11px; color: var(--muted-foreground); margin-top: 20px; max-width: 100%; overflow-wrap: anywhere; }
-.email-link svg { flex-shrink: 0; }
-.email-link:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
-.site-footer { padding-block: 42px 25px; }
-.footer-top { display: flex; justify-content: space-between; align-items: center; gap: 25px; padding-bottom: 38px; }
-.footer-top .brand-name { font-size: 27px; }
-.footer-top .brand svg { width: 30px; }
-.footer-top .brand-descriptor { font-size: 7px; }
-.footer-top > p { color: var(--muted-foreground); font-size: 11px; margin: 0 auto 0 35px; }
-.back-top { display: flex; gap: 13px; align-items: center; font-size: 11px; color: var(--muted-foreground); }
-.back-top:hover { color: var(--primary); }
-.footer-bottom { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--border); padding-top: 22px; color: var(--muted-foreground); font-size: 9px; }
+.process-list p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 330px; margin: 0; }
+/* Who the work is for. Same strip language as the process list, so it reads as
+   a band of people rather than a set of cards. */
+.audience-section { padding-block: 200px; border-top: 1px solid var(--border); }
+.audience-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 100px; }
+.audience-heading > p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 430px; margin: 0 0 4px; }
+.audience-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; list-style: none; padding: 0; margin: 64px 0 0; }
+.audience-list li { border-top: 1px solid var(--border); padding-top: 22px; }
+.audience-list span { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+.audience-list p { margin: 12px 0 0; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 300px; }
+.fit-block { margin-top: 96px; padding-top: 56px; border-top: 1px solid var(--border); }
+.fit-title { margin: 0 0 34px; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; color: var(--heading-quiet); }
+.fit-list { margin: 0; display: flex; flex-direction: column; }
+.fit-list > div { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-block: 24px; border-bottom: 1px solid var(--border); }
+.fit-list > div:first-child { padding-top: 0; }
+.fit-list > div:last-child { border-bottom: 0; padding-bottom: 0; }
+.fit-list dt { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+.fit-list dd { margin: 0; max-width: 460px; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); }
+/* A button that reads as a link: for actions that stay on the page, such as
+   reopening the cookie banner. */
+.link-button { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.figure { font-family: var(--font-figure); font-size: 0.94em; letter-spacing: 0.01em; }
 @media (max-width: 1050px) {
-  .services-section { gap: 55px; padding-block: 95px; }
-  .service-title { font-size: 18px; }
-  .service-trigger { gap: 12px; }
-  .service-content { padding-left: 55px; padding-right: 0; }
-  .belief-inner, .contact-inner { gap: 65px; }
-  .belief-copy > .belief-lead { font-size: 21px; }
+  .services-section { padding-block: 95px; }
+  .services-inner { gap: 55px; }
   .approach-heading { gap: 65px; }
   .process-list { gap: 34px; }
 }
 @media (max-width: 700px) {
-  html { scroll-padding-top: 25px; }
-  .site-header { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-top: 21px; }
-  .desktop-nav { display: flex; order: 3; grid-column: 1 / -1; justify-content: space-between; gap: 15px; font-size: 11px; border-top: 1px solid oklch(0.88 0.025 255 / 0.6); }
-  .desktop-nav a { padding-block: 10px; }
-  .hero { margin-top: 128px; min-height: 790px; padding-top: 39px; }
-  h2 { font-size: 35px; letter-spacing: -1.5px; }
-  .section-label { margin-bottom: 18px; font-size: 11px; }
-  .services-section { grid-template-columns: 1fr; gap: 37px; padding-block: 72px; }
-  .section-intro > p:not(.section-label) { font-size: 13px; margin-block: 21px 12px; max-width: 400px; }
-  .small-note { display: none; }
-  .service-trigger { padding-block: 25px; gap: 13px; }
-  .service-title { font-size: 19px; }
-  .service-content { padding-left: 58px; padding-bottom: 25px; }
-  .service-content p { font-size: 12px; }
-  .service-tags { margin-top: 17px; }
-  .service-tags li { font-size: 9px; }
-  .belief-inner { grid-template-columns: 1fr; gap: 37px; padding-block: 60px 43px; }
-  .belief-symbol { font-size: 32px; margin-bottom: 29px; }
-  .belief-section h2 { font-size: 42px; letter-spacing: -1.8px; }
+  html { --sticky-clearance: 164px; }
+  .site-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding-top: 21px; }
+  .brand-descriptor { top: calc(100% + 4px); }
+  /* The three links are one row of equal tabs under the wordmark, not three words
+     drifting to the corners: each has the same width, so the one you are reading
+     fills its own tab. The type eases down on the narrowest screens so the row
+     always fits the bar. */
+  .desktop-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); order: 3; grid-column: 1 / -1; gap: 4px; padding-top: 6px; font-size: clamp(10px, 3.1vw, 11px); }
+  .desktop-nav a { padding: 14px 4px; text-align: center; }
+  .hero { margin-top: 136px; padding-top: 64px; }
+  h2 { font-size: 35px; letter-spacing: -0.038em; }
+  .services-section { padding-block: 104px; }
+  .services-inner { grid-template-columns: 1fr; gap: 37px; }
+  .services-atmosphere::before { opacity: 0.55; }
+  .services-ribbon { width: calc(100% + 48px); top: 310px; opacity: 0.22; mask-image: linear-gradient(180deg, transparent, black 20%, black 80%, transparent); mask-composite: add; }
+  .belief-section h2 { font-size: 46px; letter-spacing: -0.046em; }
   .belief-copy { padding-top: 0; }
-  .belief-copy > .belief-lead { font-size: 21px; max-width: 340px; }
-  .belief-copy > p { font-size: 13px; }
-  .quality-promise { align-items: flex-start; line-height: 1.7; font-size: 11px; gap: 8px; }
+  .belief-copy > p { font-size: 14px; }
+  .quality-promise { align-items: flex-start; line-height: 1.7; font-size: 12px; gap: 8px; }
   .quality-promise svg { margin-top: 2px; }
-  .belief-principles { flex-direction: column; gap: 21px; padding-block: 27px 35px; font-size: 11px; }
-  .approach-section { padding-block: 70px 74px; }
+  .belief-principles { flex-direction: column; gap: 21px; padding-block: 27px 35px; font-size: 13px; }
+  .approach-section { padding-block: 104px; }
   .approach-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .approach-heading > p { font-size: 13px; max-width: 390px; }
+  .approach-heading > p { font-size: 14px; max-width: 390px; }
   .process-list { grid-template-columns: 1fr; gap: 35px; margin-top: 40px; }
   .process-top { padding-bottom: 14px; }
   .process-list h3 { margin-top: 20px; font-size: 20px; }
   .process-list p { max-width: 380px; }
-  .contact-inner { grid-template-columns: 1fr; gap: 33px; padding-block: 59px 62px; }
-  .contact-heading h2 { font-size: 44px; letter-spacing: -1.9px; }
-  .contact-copy > p { font-size: 14px; margin-bottom: 23px; }
-  .email-link { font-size: 10px; }
-  .site-footer { padding-block: 32px 22px; }
-  .footer-top { gap: 20px; padding-bottom: 26px; flex-wrap: wrap; }
-  .footer-top > p { display: none; }
-  .back-top { font-size: 10px; }
-  .footer-bottom { flex-direction: column; gap: 12px; font-size: 9px; }
+  .audience-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .fit-block { margin-top: 56px; padding-top: 40px; }
+  .fit-title { margin-bottom: 24px; font-size: 20px; }
+  .fit-list > div { grid-template-columns: 1fr; gap: 10px; padding-block: 20px; }
+  .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
+  .audience-list p { max-width: 400px; }
+}
+
+/* The bar steps aside on the closing screen: a fade, then out of sight and out of
+   reach, and it returns the same way. The fade is on the shell so it never competes
+   with the bar's own phase animations. */
+.header-shell { transition: opacity 320ms ease, visibility 0s linear 0s; }
+.header-shell[data-covered='true'] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 320ms ease, visibility 0s linear 320ms; }
+
+/* One navigation bar moves between its original position and a quiet floating surface. */
+/* Wide screens keep the bar with the reader from the very first pixel of scroll,
+   so it pulls itself together where it stands instead of waiting for the hero to
+   pass. The pin is set from JavaScript, so without it the header still scrolls
+   away with the page exactly as a plain document would. */
+@media (min-width: 701px) {
+  .site-header[data-pinned='true'] { position: fixed; top: 0; }
+  /* The bar is already on screen when it converges: nothing to fade in. */
+  .site-header[data-pinned='true'][data-phase='sticky'] { animation: none; }
+}
+/* The floating bar is a sliver, not a band: everything inside it steps down to
+   match, so the height comes from a tighter rhythm rather than from padding. */
+.site-header[data-phase='sticky'], .site-header[data-phase='leaving'] {
+  position: fixed;
+  top: 12px;
+  z-index: 30;
+  min-height: 58px;
+  padding: 9px 22px;
+}
+/* The surface lives on its own layer rather than on the bar itself, so it can
+   arrive gradually while the bar is still changing shape. Pale cyan at one end,
+   a breath of periwinkle at the other, and 95% rather than fully opaque: just
+   enough veil to notice if you look for it, not enough to ghost the words
+   passing underneath. */
+.site-header::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid oklch(0.885 0.03 258 / 0.75);
+  border-radius: var(--radius-surface);
+  background:
+    radial-gradient(40% 132% at 0% 50%, oklch(0.955 0.038 230 / 0.45), transparent 72%),
+    radial-gradient(44% 132% at 100% 50%, oklch(0.94 0.045 278 / 0.5), transparent 72%),
+    linear-gradient(97deg, oklch(0.989 0.01 238 / 0.95), oklch(0.995 0.003 255 / 0.95) 48%, oklch(0.988 0.011 268 / 0.95));
+  box-shadow: 0 6px 20px oklch(0.3 0.07 262 / 0.06);
+  transition: opacity 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.site-header:is([data-phase='sticky'], [data-phase='leaving'])::before { opacity: 1; }
+.site-header[data-phase='sticky'] { animation: navigation-arrive 240ms cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.site-header[data-phase='leaving'] { animation: navigation-leave 380ms cubic-bezier(0.4, 0, 0.6, 1) both; pointer-events: none; }
+.site-header:is([data-phase='sticky'], [data-phase='leaving']) .brand-name { font-size: 25px; letter-spacing: -1.2px; }
+.site-header:is([data-phase='sticky'], [data-phase='leaving']) .brand-descriptor { top: calc(100% + 2px); font-size: 7.5px; letter-spacing: 2.2px; }
+.site-header:is([data-phase='sticky'], [data-phase='leaving']) .desktop-nav { margin-left: 0; }
+.site-header:is([data-phase='sticky'], [data-phase='leaving']) .nav-contact { min-height: 36px; padding: 8px 15px; gap: 16px; background-color: oklch(0.995 0.003 256 / 0.75); }
+/* Past the hero the bar detaches from the content column and floats: a little
+   narrower than the page, which reads as an object rather than a band. The width
+   changes while the arrival fade still has the bar at nothing, so the contents
+   are never seen to jump sideways. Below this width the bar keeps the full
+   content width, because the navigation has its own row there. */
+@media (min-width: 1051px) {
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']) { width: min(1100px, calc(100% - 112px)); }
+}
+/* The bar does not slide in any more: it fades, then pulls itself together. */
+@keyframes navigation-arrive { from { opacity: 0; } to { opacity: 1; } }
+@keyframes navigation-leave { from { opacity: 1; transform: translate3d(-50%, 0, 0); } to { opacity: 0; transform: translate3d(-50%, -10px, 0); } }
+@media (max-width: 700px) {
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']) { top: 10px; padding: 10px 14px 0; gap: 6px 14px; }
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']) .brand-name { font-size: 25px; }
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']) .brand-descriptor { top: calc(100% + 2px); }
+  .site-header:is([data-phase='sticky'], [data-phase='leaving']) .desktop-nav a { padding-block: 10px; }
 }

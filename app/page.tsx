@@ -1,67 +1,110 @@
-import { ArrowUpRight, ArrowDown, ArrowRight, Building2, Landmark, Sparkles, Check, HeartHandshake } from 'lucide-react';
+import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import Services from './services';
+import HeroExperience from './hero-experience';
+import FlowArtwork from './flow-artwork';
+import SiteHeader from './site-header';
+import MainNav from './main-nav';
+import LanguageSwitch from './language-switch';
+import Brand from './brand';
+import AboutSection from './about-section';
+import ClosingScreen from './closing-screen';
+// The accordion's styles, imported from the server so they are inlined with the
+// rest of the page rather than loaded by the client chunk (see services.tsx).
+import './services.css';
 
-const contactHref = 'mailto:samuel.horvath@yumaniautomation.com?subject=Let%E2%80%99s%20build%20something%20with%20Yumani';
+// Every contact button leads to the survey. The address stays visible below it for
+// anyone who would rather write.
+const contactHref = '/contact';
 
-function Brand() {
-  return <a className="brand" href="#top" aria-label="Yumani Automation, home"><svg viewBox="0 0 38 40" fill="none" aria-hidden="true"><path d="M7 8L19 22M31 8L19 22V33" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/><circle cx="31" cy="30" r="3" fill="currentColor"/></svg><span className="brand-name">yumani<span className="brand-descriptor">automation</span></span></a>;
-}
+// Listed in the order the page reads, so the marker travels one way as you scroll.
+const navItems = [
+  { href: '#services', label: 'What we do' },
+  { href: '#approach', label: 'How we work' },
+  { href: '#about', label: 'About us' },
+];
+
+// Who the work is really for. Plain nouns only: no clients to name, so the
+// people doing the work are named instead.
+const audience = [
+  { who: 'The one who keeps the spreadsheet', detail: 'It works because one person remembers every exception. The rules belong in the software, not in one head.' },
+  { who: 'The one in the middle', detail: 'Copying data between two systems that were never meant to talk to each other, by hand, every week.' },
+  { who: 'The one who signs it off', detail: 'Approving a process nobody has questioned in years, from a pile of attachments.' },
+  { who: 'The one who is new', detail: 'Learning the job by watching someone else do it, because nothing is written down.' },
+];
 
 export default function Home() {
   return <div id="top">
     <a className="skip-link" href="#main">Skip to content</a>
-    <header className="site-header wrap">
-      <Brand />
-      <nav className="desktop-nav" aria-label="Main navigation"><a href="#services">What we do</a><a href="#approach">How we work</a><a href="#about">About us</a></nav>
-      <a className="nav-contact" href={contactHref}>Let’s talk <ArrowUpRight size={16} aria-hidden="true"/></a>
-    </header>
+    <SiteHeader>
+      <Brand href="#top" />
+      <MainNav items={navItems} />
+      <div className="nav-actions">
+        <LanguageSwitch/>
+        <a className="nav-contact" href={contactHref}>Let’s talk <ArrowUpRight size={16} aria-hidden="true"/></a>
+      </div>
+    </SiteHeader>
     <main id="main">
       <div className="opening">
-        <section className="hero wrap" aria-labelledby="hero-title">
-          <div className="hero-art" aria-hidden="true"><img src="/images/yumani-ribbon.jpg" alt="" width="1536" height="1024" fetchPriority="high"/></div>
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="little-spark" aria-hidden="true">✳</span> Technology with a human purpose</p>
-            <h1 id="hero-title">More time for<br/><span>what matters.</span></h1>
-            <p className="hero-description">We build software that takes care of the repetitive.<br className="desktop-break"/> So your people can get back to ideas, decisions,<br className="desktop-break"/> and the work only they can do.</p>
-            <div className="hero-actions"><a className="primary-link" href={contactHref}>Let’s build something <ArrowUpRight size={18} aria-hidden="true"/></a><a className="text-link" href="#services">Explore what we do <ArrowDown size={16} aria-hidden="true"/></a></div>
-          </div>
-          <div className="hero-bottom"><span>Thoughtfully built. Made for tomorrow.</span><span className="art-caption"><span/> More possibility. Less routine.</span></div>
-        </section>
-        <div className="audience wrap"><p>A better everyday for</p><span><Building2 size={18} aria-hidden="true"/> Businesses</span><span><Landmark size={18} aria-hidden="true"/> Institutions</span><span><Sparkles size={18} aria-hidden="true"/> The people behind them</span></div>
+        <div className="bloom" aria-hidden="true"/>
+        <HeroExperience art={<FlowArtwork />}>
+            <p className="hero-description">We build custom software, connect your systems, and take repetitive work off your team’s plate.</p>
+            <div className="hero-actions"><a className="primary-link" href={contactHref}>Tell us what you need <ArrowUpRight size={18} aria-hidden="true"/></a><a className="text-link" href="#services">See what we do <ArrowDown size={16} aria-hidden="true"/></a></div>
+        </HeroExperience>
       </div>
 
-      <section className="services-section wrap" id="services" aria-labelledby="services-title">
-        <div className="section-intro">
-          <p className="section-label">What we do</p>
-          <h2 id="services-title">Your challenges.<br/>Our kind of work.</h2>
-          <p>From the task that takes an hour every morning to the system your whole organisation depends on. We make technology work for you.</p>
-          <a className="text-link blue-link" href={contactHref}>Tell us what you have in mind <ArrowUpRight size={16} aria-hidden="true"/></a>
-          <div className="small-note"><span className="note-line"/><span>Built around your needs.<br/>Never the other way around.</span></div>
+      <section className="services-section" id="services" aria-labelledby="services-title">
+        <div className="services-atmosphere-clip" aria-hidden="true">
+          <div className="services-atmosphere">
+          <div className="bloom"/>
+          <picture className="services-ribbon">
+            <source type="image/avif" srcSet="/images/yumani-services-ribbon-720.avif 720w, /images/yumani-services-ribbon-1440.avif 1440w, /images/yumani-services-ribbon-2160.avif 2160w" sizes="(max-width: 700px) calc(100vw + 48px), calc(100vw + 80px)"/>
+            <source type="image/webp" srcSet="/images/yumani-services-ribbon-720.webp 720w, /images/yumani-services-ribbon-1440.webp 1440w, /images/yumani-services-ribbon-2160.webp 2160w" sizes="(max-width: 700px) calc(100vw + 48px), calc(100vw + 80px)"/>
+            <img src="/images/yumani-services-ribbon-1440.webp" width="2172" height="724" alt="" loading="lazy" decoding="async" fetchPriority="low"/>
+          </picture>
+          </div>
         </div>
-        <Services />
+        <div className="services-inner wrap">
+          <div className="services-heading" data-reveal="">
+            <h2 id="services-title">Your challenges.<br/><span>Our kind of work.</span></h2>
+            <div className="services-heading-copy">
+              <p>New software where nothing fits, connections between the systems you already have, and AI where it genuinely saves time. One aim throughout: fewer hours lost to copying, checking and chasing.</p>
+              <a className="text-link blue-link" href={contactHref}>Tell us what you have in mind <ArrowUpRight size={16} aria-hidden="true"/></a>
+            </div>
+          </div>
+          <Services />
+        </div>
       </section>
 
-      <section className="belief-section" id="about" aria-labelledby="belief-title">
-        <div className="belief-inner wrap">
-          <div className="belief-heading"><span className="belief-symbol" aria-hidden="true">✳</span><p className="section-label">The Yumani way</p><h2 id="belief-title">The future should<br/>feel more <span>human.</span></h2></div>
-          <div className="belief-copy"><p className="belief-lead">Better technology starts with<br className="desktop-break"/> caring about the people using it.</p><p>We’re a small, hands-on team with an appetite for hard problems. We listen closely, ask the right questions, and put the work in until the details feel right.</p><p>Our ambition is simple: help businesses and institutions make the most of this century, and give their people room to do meaningful work.</p><div className="quality-promise"><Check size={17} aria-hidden="true"/><span>Plenty of possibilities. No shortcuts on quality.</span></div></div>
-        </div>
-        <div className="belief-principles wrap"><span><span>01</span> People before processes</span><span><span>02</span> Care in every detail</span><span><span>03</span> Built to keep moving forward</span></div>
-      </section>
+      <AboutSection />
 
       <section className="approach-section wrap" id="approach" aria-labelledby="approach-title">
-        <div className="approach-heading"><div><p className="section-label">How we work</p><h2 id="approach-title">Good things start<br/>with a conversation.</h2></div><p>We work closely with you, from the first question to the final details. Clear communication, shared decisions, and a team that cares as much as you do.</p></div>
+        <div className="approach-heading" data-reveal=""><div><h2 id="approach-title">Good things start<br/>with a conversation.</h2></div><p>Every project follows the same three steps, whatever its size, so you always know where we are, what comes next and why.</p></div>
         <ol className="process-list">
-          <li><div className="process-top"><span>01</span><ArrowRight size={20} aria-hidden="true"/></div><h3>First, we listen.</h3><p>We get to know your people, your processes, and what’s getting in the way. Together, we define what better looks like.</p></li>
-          <li><div className="process-top"><span>02</span><ArrowRight size={20} aria-hidden="true"/></div><h3>Then, we build.</h3><p>We turn the right ideas into working software. You see progress, share feedback, and help shape the solution as it takes form.</p></li>
-          <li><div className="process-top"><span>03</span><Check size={20} aria-hidden="true"/></div><h3>Ready for the real world.</h3><p>We test the details, help your team get comfortable, and launch with a clear plan for what comes next.</p></li>
+          <li data-reveal=""><div className="process-top"><span>01</span></div><h3>First, we listen.</h3><p>We talk to the people who do the work, map where the time goes, and agree on what better looks like, with an estimate you can plan around.</p></li>
+          <li data-reveal=""><div className="process-top"><span>02</span></div><h3>Then, we build.</h3><p>In short rounds, with working software to try every few weeks. You tell us what’s off, the next round fixes it, and nothing big is decided without you.</p></li>
+          <li data-reveal=""><div className="process-top"><span>03</span></div><h3>Ready for the real world.</h3><p>We test with real data, move your existing records across, help your team get comfortable, and stay close after launch for fixes, questions and the next improvement.</p></li>
         </ol>
       </section>
 
-      <section className="contact-section" id="contact" aria-labelledby="contact-title">
-        <div className="contact-inner wrap"><div className="contact-heading"><p className="contact-kicker"><HeartHandshake size={20} strokeWidth={1.4} aria-hidden="true"/> Big idea or everyday challenge?</p><h2 id="contact-title">Let’s make room<br/>for <span>what’s next.</span></h2></div><div className="contact-copy"><p>Tell us what’s on your mind.<br/>We’ll figure out what’s possible, together.</p><a className="primary-link" href={contactHref}>Start a conversation <ArrowUpRight size={18} aria-hidden="true"/></a><a className="email-link" href="mailto:samuel.horvath@yumaniautomation.com">samuel.horvath@yumaniautomation.com <ArrowUpRight size={13} aria-hidden="true"/></a></div></div>
+      <section className="audience-section wrap" id="who" aria-labelledby="audience-title">
+        <div className="audience-heading" data-reveal="">
+          <div><h2 id="audience-title">Every organisation is really<br/>a few people holding it together.</h2></div>
+          <p>Software should hand those people their time back, not give them another system to serve. That is who we build for, in companies, schools, hospitals and city offices alike.</p>
+        </div>
+        <ul className="audience-list">
+          {audience.map(({ who, detail }) => <li key={who} data-reveal=""><span>{who}</span><p>{detail}</p></li>)}
+        </ul>
+        <div className="fit-block" data-reveal="">
+          <h3 className="fit-title">When we’re not the right fit</h3>
+          <dl className="fit-list">
+            <div><dt>You need it finished by Friday.</dt><dd>Real work takes weeks. Pretending otherwise would be the first thing we got wrong.</dd></div>
+            <div><dt>The decision will be made on price alone.</dt><dd>We are not the cheapest, and we would rather say that now than surprise you later.</dd></div>
+            <div><dt>Nobody on your side can spare an hour a week.</dt><dd>Someone who knows how the work really runs has to be in the room, or we are only guessing.</dd></div>
+            <div><dt>You want AI because everyone else has it.</dt><dd>We add AI where it saves real time, and we’ll tell you when a simple rule would do the job better.</dd></div>
+          </dl>
+        </div>
       </section>
     </main>
-    <footer className="site-footer wrap"><div className="footer-top"><Brand/><p>Less routine. More human.</p><a className="back-top" href="#top">Back to top <ArrowUpRight size={15} aria-hidden="true"/></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} yumani automation s.r.o.</span><span>Thoughtfully built, down to the last detail.</span></div></footer>
+    <ClosingScreen/>
   </div>;
 }

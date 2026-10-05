@@ -1,0 +1,9 @@
+/* The bar above a page that is not the home page. */
+.page-bar { display: flex; align-items: center; justify-content: space-between; gap: 30px; min-height: 112px; }
+.page-bar .text-link { white-space: nowrap; }
+.page-bar .text-link > svg { flex-shrink: 0; transition: transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.page-bar .text-link:is(:hover, :focus-visible) > svg { transform: translateX(-2px); }
+@media (prefers-reduced-motion: reduce) { .page-bar .text-link > svg { transform: none !important; } }
+
+@media (max-width: 700px) { .page-bar { min-height: 90px; gap: 16px; } }
+@media print { .page-bar { display: none; } }

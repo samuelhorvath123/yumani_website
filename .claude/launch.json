@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/Users/samovic999/.nvm/versions/node/v22.19.0/bin/node",
+      "runtimeArgs": [
+        "node_modules/vinext/dist/cli.js",
+        "dev",
+        "--port",
+        "5173"
+      ],
+      "port": 5173
+    }
+  ]
+}

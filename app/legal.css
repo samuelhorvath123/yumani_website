@@ -1,0 +1,65 @@
+/* The legal pages: long reading, so the measure is held to about 70 characters
+   and the body text sits a step darker than the page's supporting copy. */
+.legal { --legal-text: color-mix(in oklch, var(--foreground) 62%, var(--muted-foreground)); display: grid; grid-template-columns: 250px minmax(0, 1fr); column-gap: 96px; padding-block: 56px 160px; }
+.legal-intro { grid-column: 1 / -1; max-width: 760px; margin-bottom: 80px; }
+.legal-kicker { margin: 0; font-size: 13px; font-weight: 700; color: var(--muted-foreground); }
+.legal h1 { margin-top: 16px; font-size: clamp(40px, 5vw, 64px); color: var(--heading-quiet); }
+.legal-lead { margin: 28px 0 0; max-width: 620px; font-size: 18px; line-height: 1.65; font-weight: 500; color: var(--muted-foreground); }
+.legal-updated { margin: 22px 0 0; font-size: 13px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+
+.legal-toc { position: sticky; top: 40px; align-self: start; }
+.legal-toc-label { margin: 0 0 14px; font-size: 13px; font-weight: 700; }
+.legal-toc ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+.legal-toc li { border-bottom: 1px solid var(--border); }
+.legal-toc a { display: grid; grid-template-columns: 28px 1fr; gap: 6px; padding-block: 11px; font-size: 14px; line-height: 1.45; color: var(--muted-foreground); transition: color 300ms ease; }
+.legal-toc a span { font-family: var(--font-figure); font-size: 12px; padding-top: 1px; color: var(--primary); font-variant-numeric: tabular-nums; }
+.legal-toc a:is(:hover, :focus-visible) { color: var(--primary); }
+
+.legal-body { max-width: 700px; }
+.legal-body section + section { margin-top: 64px; padding-top: 56px; border-top: 1px solid var(--border); }
+.legal-body h2 { display: flex; align-items: baseline; gap: 16px; font-size: clamp(26px, 2.4vw, 32px); line-height: 1.25; letter-spacing: -0.03em; color: var(--heading-quiet); }
+.legal-number { flex-shrink: 0; font-family: var(--font-figure); font-size: 13px; font-weight: 400; letter-spacing: 0.04em; color: var(--primary); font-variant-numeric: tabular-nums; }
+.legal-body h3 { margin: 40px 0 0; font-size: 19px; line-height: 1.4; letter-spacing: -0.02em; color: var(--foreground); }
+.legal-body p, .legal-body li { font-size: 16px; line-height: 1.75; color: var(--legal-text); }
+.legal-body p { margin: 20px 0 0; }
+.legal-body h2 + p, .legal-body h3 + p { margin-top: 16px; }
+.legal-body ul, .legal-body ol { margin: 20px 0 0; padding-left: 22px; }
+.legal-body li { margin-top: 10px; padding-left: 4px; }
+.legal-body li::marker { color: var(--primary); }
+.legal-body strong { font-weight: 600; color: var(--foreground); }
+.legal-body a, .legal-body .link-button { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.legal-body a:hover, .legal-body .link-button:hover { text-decoration-thickness: 2px; }
+.legal-body .link-button { font-size: inherit; }
+
+/* Facts in a column: a label, then what it means. One shape for the cookie
+   record, the company details and each way we handle personal data. */
+.legal-facts { margin: 24px 0 0; border-top: 1px solid var(--border); }
+.legal-facts > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 24px; padding-block: 14px; border-bottom: 1px solid var(--border); }
+.legal-facts dt { font-size: 14px; font-weight: 600; line-height: 1.75; color: var(--foreground); }
+.legal-facts dd { margin: 0; font-size: 15px; line-height: 1.7; color: var(--legal-text); }
+.legal-facts .figure { font-size: 0.92em; color: var(--foreground); }
+.legal-actions { margin-top: 28px; }
+.legal-actions .consent-button { min-width: 200px; }
+
+@media (max-width: 1050px) {
+  .legal { grid-template-columns: 1fr; padding-block: 40px 120px; }
+  .legal-intro { margin-bottom: 56px; }
+  /* The contents list sits above the text instead of beside it. */
+  .legal-toc { position: static; margin-bottom: 64px; }
+}
+@media (max-width: 700px) {
+  .legal-lead { font-size: 16px; margin-top: 22px; }
+  .legal-intro { margin-bottom: 44px; }
+  .legal-toc { margin-bottom: 48px; }
+  .legal-body section + section { margin-top: 48px; padding-top: 44px; }
+  .legal-body h2 { gap: 12px; }
+  .legal-body h3 { margin-top: 32px; font-size: 18px; }
+  .legal-facts > div { grid-template-columns: 1fr; gap: 2px; padding-block: 12px; }
+  .legal-actions .consent-button { width: 100%; }
+}
+@media print {
+  .page-bar, .legal-toc, .skip-link, .site-footer { display: none; }
+  .legal { display: block; padding-block: 0; }
+  .legal-body { max-width: none; }
+  .legal-body p, .legal-body li, .legal-facts dd { color: black; }
+}

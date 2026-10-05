@@ -25,5 +25,19 @@ npx tsc --noEmit
 - Design tokens and responsive styles: `app/globals.css`
 - Page metadata: `app/layout.tsx`
 - Brand and design context: `PRODUCT.md` and `DESIGN.md`
+- Legal pages: `app/privacy/page.tsx`, `app/cookies/page.tsx` and `app/terms/page.tsx`, on the shared shell in `app/legal-page.tsx`. Company details and the "last updated" date are in `lib/company.ts`; update both whenever the wording changes in substance.
+- Cookie banner: `app/cookie-consent.tsx`, with its logic in `lib/consent.ts`. The site sets one first-party cookie, `yumani_consent`. Before adding any optional tool (analytics, embeds), gate it on the stored choice, list its cookies in the Cookie Policy, and bump `CONSENT_VERSION` so visitors are asked again.
 
-Contact actions open the visitor's email app addressed to samuel.horvath@yumaniautomation.com. There is no form backend, visitor tracking, or invented customer proof. The Sites deployment is private for review; public access and a custom domain can be configured separately.
+Every contact button leads to the survey at `/contact`: four short questions that are checked in the browser and again on the server (`app/api/contact/route.ts`, logic in `lib/contact.ts`), then emailed to info@yumaniautomation.com. Nothing is stored; the answers exist in the request and in the email. There is no visitor tracking or invented customer proof.
+
+### Making the survey deliver
+
+The route sends through the Resend email API and needs two secrets. Without them it answers "unavailable" and the survey tells the visitor to email instead, so it fails honestly, never silently.
+
+| Name | Value |
+| --- | --- |
+| `RESEND_API_KEY` | A key from a Resend account (secret). |
+| `CONTACT_FROM` | A sender on a domain verified in Resend, for example `Yumani website <website@yumaniautomation.com>`. |
+| `CONTACT_TO` | Optional. Where enquiries go; defaults to info@yumaniautomation.com. |
+
+Set them as secrets or environment variables in the hosting dashboard. For local testing put them in `.dev.vars` (ignored by git). Verify the sending domain in Resend first, or every message is refused. If a bot problem ever appears, add a rate-limiting rule for `/api/contact` at the host: the route already ignores scripts that fill the hidden field or send too fast, but it cannot count requests by itself. The Sites deployment is private for review; public access and a custom domain can be configured separately.

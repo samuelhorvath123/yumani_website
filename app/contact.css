@@ -1,0 +1,125 @@
+/* The contact page: a calm heading beside one card that asks a question at a time.
+   Everything you can act on wears the page's own hairline and 7px corner; the card
+   is the 16px floating surface the navigation bar and the cookie banner use. */
+.contact-page { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); column-gap: 110px; align-items: start; padding-block: 56px 160px; }
+.contact-intro { position: sticky; top: 40px; }
+.contact-kicker { margin: 0; font-size: 13px; font-weight: 700; color: var(--muted-foreground); }
+.contact-page h1 { margin-top: 16px; font-size: clamp(40px, 4.6vw, 64px); color: var(--heading-quiet); }
+.contact-lead { margin: 28px 0 0; max-width: 460px; font-size: 17px; line-height: 1.7; font-weight: 500; color: var(--muted-foreground); }
+.contact-direct { margin: 26px 0 0; font-size: 14px; color: var(--muted-foreground); }
+.contact-direct a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.contact-direct a:hover { text-decoration-thickness: 2px; }
+
+.survey {
+  max-width: 620px;
+  padding: 36px;
+  border: 1px solid oklch(0.885 0.03 258 / 0.75);
+  border-radius: var(--radius-surface);
+  background:
+    radial-gradient(60% 40% at 0% 0%, oklch(0.955 0.038 230 / 0.4), transparent 70%),
+    radial-gradient(60% 40% at 100% 100%, oklch(0.94 0.045 278 / 0.4), transparent 70%),
+    oklch(0.995 0.003 255 / 0.97);
+  box-shadow: 0 6px 20px oklch(0.3 0.07 262 / 0.06);
+}
+.survey-progress { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+.survey-progress p { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted-foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.survey-progress ol { display: flex; gap: 6px; flex: 1; max-width: 220px; margin: 0; padding: 0; list-style: none; }
+.survey-progress li { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background-color 500ms ease; }
+.survey-progress li[data-state='done'] { background: oklch(0.68 0.14 280); }
+.survey-progress li[data-state='current'] { background: var(--primary); }
+.survey-title { font-size: clamp(26px, 2.4vw, 32px); line-height: 1.25; letter-spacing: -0.03em; color: var(--foreground); }
+.survey-title:focus { outline: none; }
+.survey-title:focus-visible { outline: 3px solid var(--primary); outline-offset: 6px; border-radius: 2px; }
+.survey-hint { margin: 12px 0 28px; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 480px; }
+
+/* Choices are whole tiles, the way the page's other controls are: the hairline
+   and 7px corner of the Let's talk button, a wash on hover, cobalt when chosen. */
+.survey-choices { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.survey-choice {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 54px;
+  padding: 14px 18px;
+  border: 1px solid oklch(0.67 0.07 260 / 0.4);
+  border-radius: var(--radius-control);
+  background-color: oklch(0.995 0.003 256 / 0.75);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 450ms ease, border-color 450ms ease, background-color 450ms ease;
+}
+.survey-choice::before { content: ''; position: absolute; z-index: -1; inset: 0; border-radius: inherit; pointer-events: none; background-color: oklch(0.68 0.14 280 / 0.15); opacity: 0; transition: opacity 320ms ease, background-color 900ms ease-in-out; }
+.survey-choice:hover { border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.survey-choice:hover::before { opacity: 1; background-color: color-mix(in oklch, var(--primary) 10%, transparent); }
+.survey-choice input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; margin: 0; cursor: pointer; }
+.survey-choice svg { flex-shrink: 0; color: var(--primary); opacity: 0; transform: scale(0.7); transition: opacity 300ms ease, transform 400ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.survey-choice:has(input:checked) { border-color: var(--primary); background-color: color-mix(in oklch, var(--primary) 7%, oklch(0.995 0.003 256)); color: var(--primary); }
+.survey-choice:has(input:checked) svg { opacity: 1; transform: none; }
+.survey-choice:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 3px; }
+.survey-choices[data-invalid] .survey-choice { border-color: oklch(0.55 0.18 25); }
+
+.survey-field { margin-top: 20px; }
+.survey-field:first-child { margin-top: 0; }
+.survey-field label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.survey-field label span { font-weight: 500; color: var(--muted-foreground); }
+.survey-input {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid oklch(0.67 0.07 260 / 0.4);
+  border-radius: var(--radius-control);
+  background-color: oklch(0.995 0.003 256 / 0.9);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  transition: border-color 350ms ease;
+}
+textarea.survey-input { resize: vertical; min-height: 160px; }
+.survey-input::placeholder { color: oklch(0.58 0.03 260); }
+.survey-input:hover { border-color: color-mix(in oklch, var(--primary) 58%, var(--border)); }
+.survey-input:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-color: var(--primary); }
+.survey-input[aria-invalid='true'] { border-color: oklch(0.55 0.18 25); }
+.survey-error { margin: 10px 0 0; font-size: 14px; line-height: 1.55; font-weight: 500; color: oklch(0.5 0.17 25); }
+.survey-failed { margin-top: 22px; }
+.survey-failed a { text-decoration: underline; text-underline-offset: 3px; }
+.survey-note { margin: 22px 0 0; font-size: 13px; line-height: 1.7; color: var(--muted-foreground); }
+.survey-note a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.survey-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.survey-actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 32px; }
+.survey-actions .primary-link { min-height: 54px; }
+.survey-actions .primary-link:disabled { opacity: 0.7; cursor: progress; }
+.survey-actions .primary-link > svg { flex-shrink: 0; transition: transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.survey-actions .primary-link:is(:hover, :focus-visible):not(:disabled) > svg { transform: translate(2px, 0); }
+.survey-back { border: 0; background: none; font-family: inherit; cursor: pointer; padding-inline: 0; }
+.survey-back > svg { transition: transform 560ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.survey-back:is(:hover, :focus-visible) > svg { transform: translateX(-2px); }
+.survey-done { margin-top: 8px; }
+
+@media (max-width: 1050px) {
+  .contact-page { grid-template-columns: minmax(0, 1fr); row-gap: 48px; padding-block: 40px 120px; }
+  .contact-intro { position: static; }
+  .survey { max-width: none; }
+}
+@media (max-width: 700px) {
+  .contact-page { row-gap: 36px; }
+  .contact-lead { font-size: 16px; margin-top: 22px; }
+  .survey { padding: 24px 20px; }
+  .survey-progress { margin-bottom: 22px; }
+  .survey-hint { margin-bottom: 22px; }
+  .survey-actions .primary-link { min-height: 50px; }
+}
+@media (prefers-contrast: more) {
+  .survey { border-color: var(--foreground); }
+  .survey-choice, .survey-input { border-color: var(--foreground); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .survey-choice svg, .survey-actions .primary-link > svg, .survey-back > svg { transform: none !important; }
+}
+@media print { .survey { display: none; } }
