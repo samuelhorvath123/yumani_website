@@ -1,0 +1,121 @@
+/* Questions worth asking. The disclosure is the services list's, simplified: the
+   same hairlines, the same wash on the open row, the same plus that turns into a
+   minus, with the question in place of the icon and the challenge line. */
+#faq {
+  --faq-ease: cubic-bezier(.22, 1, .36, 1);
+  --faq-inset: 24px;
+  --faq-rule: oklch(.79 .041 260 / .38);
+  padding-block: 120px 160px;
+  border-top: 1px solid var(--border);
+}
+#faq .faq-inner { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; align-items: start; }
+#faq .faq-heading { position: sticky; top: calc(var(--sticky-clearance) + 24px); }
+#faq .faq-heading h2 { margin: 0; }
+#faq .faq-heading p { margin: 24px 0 14px; max-width: 400px; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
+
+#faq .faq-list { display: flex; flex-direction: column; width: 100%; border-top: 1px solid var(--faq-rule); }
+#faq .faq-item { position: relative; isolation: isolate; min-width: 0; border-bottom: 1px solid var(--faq-rule); }
+#faq .faq-item::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, oklch(.94 .033 264 / .76), oklch(.975 .014 252 / .4) 68%, oklch(.985 .005 255 / 0));
+  opacity: 0;
+  transition: opacity 800ms var(--faq-ease);
+}
+#faq .faq-item:has(.faq-trigger[aria-expanded='true'])::before { opacity: 1; }
+
+#faq .faq-heading-row { display: flex; margin: 0; }
+#faq .faq-trigger {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  gap: 24px;
+  align-items: center;
+  min-width: 0;
+  min-height: 88px;
+  padding: 22px var(--faq-inset);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--foreground);
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  transition: color 600ms var(--faq-ease), background-color 600ms var(--faq-ease);
+}
+#faq .faq-trigger:hover { background: oklch(.945 .024 260 / .26); color: var(--primary); }
+#faq .faq-trigger[aria-expanded='true'] { color: var(--primary); }
+#faq .faq-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 1; }
+#faq .faq-question { font-size: clamp(19px, 1.7vw, 23px); font-weight: 500; line-height: 1.3; letter-spacing: -.03em; text-wrap: balance; }
+
+#faq .faq-toggle {
+  position: relative;
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: 1px solid oklch(.76 .043 262 / .5);
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  transition: color 600ms var(--faq-ease), border-color 600ms var(--faq-ease), background-color 600ms var(--faq-ease);
+}
+#faq .faq-toggle span {
+  position: absolute;
+  inset: calc(50% - .75px) auto auto calc(50% - 6px);
+  width: 12px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 650ms var(--faq-ease), opacity 450ms var(--faq-ease);
+}
+#faq .faq-toggle span:last-child { transform: rotate(90deg); }
+#faq .faq-trigger:hover .faq-toggle { color: var(--primary); }
+#faq .faq-trigger[aria-expanded='true'] .faq-toggle { color: var(--primary); border-color: oklch(.68 .11 264 / .5); background: oklch(.98 .012 260 / .6); }
+#faq .faq-trigger[aria-expanded='true'] .faq-toggle span:last-child { transform: rotate(0deg); opacity: 0; }
+
+/* Rows animate from 0fr to 1fr, so the panel opens to its natural height with
+   nothing measured in script. */
+#faq .faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows 650ms var(--faq-ease), opacity 550ms var(--faq-ease), visibility 0s linear 650ms;
+}
+#faq .faq-panel[data-open='true'] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
+#faq .faq-panel-clip { min-height: 0; overflow: hidden; }
+#faq .faq-answer { padding: 0 calc(var(--faq-inset) + 36px + 24px) 30px var(--faq-inset); }
+#faq .faq-answer p { max-width: 560px; margin: 0; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
+#faq .faq-link { color: var(--primary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in oklch, var(--primary) 45%, transparent); transition: text-decoration-color 300ms ease; }
+#faq .faq-link:is(:hover, :focus-visible) { text-decoration-color: var(--primary); }
+
+@media (max-width: 1050px) {
+  #faq { padding-block: 96px 120px; }
+  #faq .faq-inner { gap: 56px; }
+  #faq { --faq-inset: 16px; }
+}
+
+@media (max-width: 860px) {
+  #faq .faq-inner { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  #faq .faq-heading { position: static; }
+}
+
+@media (max-width: 700px) {
+  #faq { padding-block: 72px 96px; --faq-inset: 0px; }
+  #faq .faq-heading p { font-size: 14px; }
+  #faq .faq-trigger { grid-template-columns: minmax(0, 1fr) 28px; gap: 16px; min-height: 76px; padding-block: 18px; }
+  #faq .faq-toggle { width: 28px; height: 28px; }
+  #faq .faq-item::before { inset-inline: -12px; }
+  #faq .faq-answer { padding: 0 12px 26px 0; }
+  #faq .faq-answer p { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #faq .faq-panel { transition: none; }
+}
+
+@media (prefers-contrast: more) {
+  #faq { --faq-rule: oklch(.59 .05 260 / .7); }
+}
