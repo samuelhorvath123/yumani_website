@@ -46,6 +46,19 @@
   --rise-hero-step: 270ms;
   --rise-hero-depth: 44px;
   --rise-art: 3750ms;
+  /* The list spotlight (services, audience, fit): the row under the pointer stays
+     at full strength while its neighbours settle back to --spot-floor, its title
+     slides --spot-slide to the right (the tagline half as far, so the two read as
+     layers) and a hairline of cobalt draws across its divider. Short and sharp
+     where the arrival is slow: a hover is a reply to the pointer, so it has to
+     land before the pointer has moved on. */
+  --spot-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --spot-time: 460ms;
+  --spot-fade: 340ms;
+  --spot-slide: 10px;
+  --spot-floor: 0.36;
+  /* The open service keeps more of its strength, because it is holding text. */
+  --spot-floor-open: 0.62;
 }
 
 * { box-sizing: border-box; }
@@ -456,6 +469,45 @@ h3 { font-weight: 600; }
 .fit-list > div:last-child { border-bottom: 0; padding-bottom: 0; }
 .fit-list dt { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
 .fit-list dd { margin: 0; max-width: 460px; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); }
+/* Spotlight (see --spot-* in :root). One pair of switches drives it, both set on
+   the way in and left at 0 otherwise: --spot on the list says "something is
+   being pointed at", --on on a row says "this one". A row's parts then work out
+   their own opacity, slide and line from those two numbers, so a touch screen,
+   where :hover sticks after a tap, simply never sets them. The children are
+   dimmed, never the data-reveal row itself: its opacity belongs to the arrival.
+   The audience columns are 40px apart, so each row's hit area reaches halfway
+   across the gap and the pointer never falls between two of them. */
+.audience-list, .fit-list { --spot: 0; }
+.audience-list li, .fit-list > div { position: relative; --on: 0; }
+.audience-list li > *, .fit-list > div > * {
+  opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
+  transition: opacity var(--spot-fade) var(--spot-ease), translate var(--spot-time) var(--spot-ease);
+}
+.audience-list li > span, .fit-list dt { translate: calc(var(--on) * var(--spot-slide)) 0; }
+.audience-list li > p, .fit-list dd { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
+/* The line enters from the left and leaves to the right, so a pointer moving down
+   the list passes the line on, row to row. */
+.audience-list li::before, .fit-list > div::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--primary);
+  pointer-events: none;
+  transform: scaleX(var(--on));
+  transform-origin: calc((1 - var(--on)) * 100%) 50%;
+  transition: transform var(--spot-time) var(--spot-ease);
+}
+.audience-list li::before { top: -1px; }
+.fit-list > div::before { bottom: -1px; }
+.fit-list > div:last-child::before { display: none; }
+.audience-list li::after { content: ''; position: absolute; inset: 0 -20px; }
+@media (hover: hover) and (pointer: fine) {
+  .audience-list:has(li:hover), .fit-list:has(> div:hover) { --spot: 1; }
+  .audience-list li:hover, .fit-list > div:hover { --on: 1; }
+}
+@media (prefers-reduced-motion: reduce) { :root { --spot-slide: 0px; } }
+@media (prefers-contrast: more) { :root { --spot-floor: 0.7; --spot-floor-open: 0.8; } }
 /* A button that reads as a link: for actions that stay on the page, such as
    reopening the cookie banner. */
 .link-button { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
@@ -500,6 +552,7 @@ h3 { font-weight: 600; }
   .fit-title { margin-bottom: 24px; font-size: 20px; }
   .fit-list > div { grid-template-columns: 1fr; gap: 10px; padding-block: 20px; }
   .audience-list { grid-template-columns: 1fr; gap: 32px; margin-top: 44px; }
+  .audience-list li::after { inset: 0 0 -16px; }
   .audience-list p { max-width: 400px; }
 }
 

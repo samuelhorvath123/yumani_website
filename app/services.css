@@ -96,6 +96,41 @@
 #services .service-trigger[aria-expanded='true'] .service-toggle { color: var(--primary); border-color: oklch(.68 .11 264 / .5); background: oklch(.98 .012 260 / .6); }
 #services .service-trigger[aria-expanded='true'] .service-toggle span:last-child { transform: rotate(0deg); opacity: 0; }
 
+/* Spotlight. The row under the pointer (or holding keyboard focus) stays at full
+   strength, the others settle back, the title slides right and a cobalt line
+   draws across the divider. The tokens and the --spot / --on switches are
+   explained with the audience list in globals.css; here the row's header and its
+   panel are what dim, because the row itself carries the arrival animation and
+   the panel's own opacity belongs to opening and closing. The row's own colour
+   and wash on hover are untouched. */
+#services .service-list { --spot: 0; }
+#services .service-item { --on: 0; }
+#services .service-item:has(.service-trigger[aria-expanded='true']) { --spot-floor: var(--spot-floor-open); }
+#services .service-list:has(.service-trigger:focus-visible) { --spot: 1; }
+#services .service-item:has(.service-trigger:focus-visible) { --on: 1; }
+@media (hover: hover) and (pointer: fine) {
+  #services .service-list:has(.service-item:hover) { --spot: 1; }
+  #services .service-item:hover { --on: 1; }
+}
+#services .service-heading, #services .service-panel-clip {
+  opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
+  transition: opacity var(--spot-fade) var(--spot-ease);
+}
+#services .service-title, #services .service-challenge { transition: translate var(--spot-time) var(--spot-ease); }
+#services .service-title { translate: calc(var(--on) * var(--spot-slide)) 0; }
+#services .service-challenge { translate: calc(var(--on) * var(--spot-slide) / 2) 0; }
+#services .service-item::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: var(--primary);
+  pointer-events: none;
+  transform: scaleX(var(--on));
+  transform-origin: calc((1 - var(--on)) * 100%) 50%;
+  transition: transform var(--spot-time) var(--spot-ease);
+}
+
 /* Rows animate from 0fr to 1fr, so the panel opens to its natural height with
    nothing measured in script. */
 #services .service-panel {
