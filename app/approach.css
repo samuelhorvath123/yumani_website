@@ -42,85 +42,170 @@
 .approach-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 100px; }
 .approach-heading > p { max-width: 360px; margin: 0 0 4px; font-size: 15px; line-height: 1.75; color: oklch(.91 .025 257); }
 
-/* The strand the three steps hang on. Its fill is drawn by scrolling where the
-   browser can do that, and is simply there everywhere else. */
-.process { position: relative; margin-top: 80px; }
+/* The strand the steps hang on runs down the left at every width, with the steps beside
+   it: on a wide screen each step is a row (the number and title, what we do, what you
+   get), on a narrow one they stack. It is lit as far as the reading line, 62% of the way
+   down the window, by scrolling where the browser can do that, and is simply there
+   everywhere else. */
+.process {
+  --num: clamp(60px, 5.8vw, 84px);
+  --strand-x: 6px;
+  position: relative;
+  margin-top: 72px;
+}
 .process-line {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 6px;
-  height: 1px;
+  left: var(--strand-x);
+  top: calc(var(--num) / 2);
+  bottom: -72px;
+  width: 1px;
   background: var(--band-rule);
   /* The strand runs on past the last step: the work does not end at launch. */
-  mask-image: linear-gradient(90deg, black 78%, transparent);
+  mask-image: linear-gradient(180deg, black calc(100% - 150px), transparent);
 }
-.process-line-fill { position: absolute; inset: 0; transform-origin: 0 50%; background: linear-gradient(90deg, var(--band-lit), oklch(.8 .1 268)); }
+.process-line-fill { position: absolute; inset: 0; transform-origin: 50% 0; background: linear-gradient(180deg, var(--band-lit), oklch(.8 .1 268)); }
 
-/* Each step borrows its rows from the list, so the numbers, titles, text and
-   deliverables line up across all three. */
-.process-list { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto auto 1fr auto; column-gap: 54px; list-style: none; margin: 0; padding: 0; }
-.process-list > li { display: grid; grid-row: span 5; grid-template-rows: subgrid; min-width: 0; }
-.process-node { display: block; width: 13px; height: 13px; border-radius: 50%; background: var(--band-lit); box-shadow: 0 0 0 6px oklch(.8 .1 262 / .28); }
-.process-number { display: block; margin-top: 26px; font-size: 12px; letter-spacing: .04em; font-variant-numeric: tabular-nums; color: var(--band-accent-text); }
-.process-list h3 { margin: 14px 0 12px; font-size: 22px; line-height: 1.35; letter-spacing: -.5px; color: var(--band-ink); }
-.process-text { max-width: 340px; margin: 0; font-size: 15px; line-height: 1.7; color: var(--band-text); }
+.process-list { position: relative; display: grid; row-gap: clamp(52px, 6.4vw, 92px); list-style: none; margin: 0; padding: 0; }
+.process-list > li {
+  /* One switch per step: 1 is lit, 0 is a ghost of itself. A step is lit until the page is
+     watching it (so without script it is complete), and from then on only once the reader
+     has reached it, or while the pointer is on it. Everything that changes with it (the
+     node, the number, the dots, the rule) is mixed from this one number, so they cannot
+     disagree. */
+  --lit: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(240px, .85fr) minmax(0, 1fr) minmax(0, .95fr);
+  grid-template-areas: 'num . .' 'title text gets';
+  align-content: start;
+  column-gap: clamp(32px, 4.6vw, 72px);
+  padding-left: 64px;
+  min-width: 0;
+}
+.process[data-watching] .process-list > li:not([data-reached]) { --lit: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .process[data-watching] .process-list > li:hover { --lit: 1; }
+}
+
+.process-node {
+  position: absolute;
+  left: 0;
+  top: calc(var(--num) / 2 - 6.5px);
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--band-dim), var(--band-lit) calc(var(--lit) * 100%));
+  box-shadow: 0 0 0 6px oklch(.8 .1 262 / calc(var(--lit) * .28));
+  transition: background-color 500ms ease, box-shadow 500ms ease;
+}
+/* The number is set large in the page's own face, because it is a piece of typography here
+   and not a label: a small monospace figure in a system font was the one generic thing in
+   the section. It warms from a ghost of the field to the strand's own light as the step is
+   reached. */
+.process-number {
+  grid-area: num;
+  display: block;
+  margin: 0 0 18px;
+  font-size: var(--num);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -.055em;
+  color: color-mix(in oklch, oklch(.54 .12 261), var(--band-lit) calc(var(--lit) * 100%));
+  transition: color 700ms ease;
+}
+.process-list h3 { grid-area: title; margin: 0; font-size: clamp(24px, 2.3vw, 30px); line-height: 1.25; letter-spacing: -.03em; color: var(--band-ink); }
+.process-text { grid-area: text; max-width: 380px; margin: 0; padding-top: 5px; font-size: 15px; line-height: 1.7; color: var(--band-text); }
 
 /* The same label and bullets the service rows use for "What that can look like". */
-.process-gets { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--band-rule); }
+.process-gets {
+  grid-area: gets;
+  margin: 0;
+  padding: 4px 0 0 28px;
+  border-left: 1px solid color-mix(in oklch, var(--band-rule), oklch(.9 .06 258 / .6) calc(var(--lit) * 100%));
+  transition: border-color 700ms ease 300ms;
+}
 .process-gets .process-gets-label { margin: 0 0 13px; font-size: 12px; line-height: 1.5; color: var(--band-text); }
 .process-gets ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
 .process-gets li { display: flex; gap: 11px; align-items: baseline; font-size: 14px; line-height: 1.5; color: oklch(.95 .015 256); }
-.process-gets li::before { content: ''; width: 3px; height: 3px; flex: 0 0 3px; align-self: center; border-radius: 50%; background: var(--band-accent); }
+.process-gets li::before { content: ''; width: 3px; height: 3px; flex: 0 0 3px; align-self: center; border-radius: 50%; background: color-mix(in oklch, var(--band-dim), var(--band-accent) calc(var(--lit) * 100%)); transition: background-color 500ms ease 500ms; }
+.process-gets li:nth-child(2)::before { transition-delay: 620ms; }
+.process-gets li:nth-child(3)::before { transition-delay: 740ms; }
+/* A step reached while the reader scrolls waits its turn, so two that arrive together
+   still read in order. */
+.process-list > li[data-play='true'] :is(.process-node, .process-number) { transition-delay: var(--wait, 0ms); }
+.process-list > li[data-play='true'] .process-gets { transition-delay: calc(var(--wait, 0ms) + 300ms); }
+.process-list > li[data-play='true'] .process-gets li::before { transition-delay: calc(var(--wait, 0ms) + 500ms); }
+.process-list > li[data-play='true'] .process-gets li:nth-child(2)::before { transition-delay: calc(var(--wait, 0ms) + 620ms); }
+.process-list > li[data-play='true'] .process-gets li:nth-child(3)::before { transition-delay: calc(var(--wait, 0ms) + 740ms); }
+
+/* The two things a scroll timeline cannot do, because they take their own time: a ring that
+   leaves the node as the strand reaches it, and a spark of light that runs down the strand
+   to the next node, the way light runs through the hero's ribbon. The spark's length and
+   speed come from the distance to that node (--seg, and --spark for its duration), which
+   the script measures. */
+.process-node::before { content: ''; position: absolute; inset: -1px; border: 1px solid var(--band-lit); border-radius: 50%; opacity: 0; pointer-events: none; }
+.process-node::after { content: ''; position: absolute; left: 5px; top: 13px; width: 3px; height: 110px; border-radius: 3px; opacity: 0; pointer-events: none; background: linear-gradient(180deg, transparent, oklch(.98 .025 258)); box-shadow: 0 0 14px oklch(.88 .09 262 / .9); }
 
 .process-throughout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; align-items: baseline; margin: 80px 0 0; padding-top: 28px; border-top: 1px solid var(--band-rule); max-width: none; font-size: 18px; line-height: 1.6; letter-spacing: -.015em; font-weight: 500; color: var(--band-ink); }
 .process-throughout > span { font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--band-accent-text); }
 
-@keyframes process-draw-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes process-draw-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes process-node-on {
-  from { background: var(--band-dim); box-shadow: 0 0 0 0 oklch(.8 .1 262 / 0); }
-  to { background: var(--band-lit); box-shadow: 0 0 0 6px oklch(.8 .1 262 / .28); }
+@keyframes process-ping { 0% { transform: scale(1); opacity: 0; } 12% { opacity: .85; } 100% { transform: scale(3.6); opacity: 0; } }
+@keyframes process-spark {
+  0% { transform: translateY(-116px); opacity: 0; }
+  16% { opacity: 1; }
+  84% { opacity: 1; }
+  100% { transform: translateY(calc(var(--seg, 240px) - 116px)); opacity: 0; }
 }
 
-/* Where the browser can tie an animation to scrolling, the strand draws itself as
-   the steps pass the middle of the screen and each step lights as the line
-   reaches it. The compositor does the drawing; nothing runs in script. */
+@media (prefers-reduced-motion: no-preference) {
+  .process-list > li[data-play='true'] .process-node::before { animation: process-ping 1100ms cubic-bezier(.2, .7, .2, 1) var(--wait, 0ms) both; }
+  .process-list > li[data-play='true'] .process-node::after { animation: process-spark var(--spark, 1000ms) cubic-bezier(.4, .05, .3, 1) calc(var(--wait, 0ms) + 250ms) both; }
+}
+
+/* Where the browser can tie an animation to scrolling, the strand is lit as far as the reading
+   line (62vh): it starts when the strand's top crosses that line and is complete when its
+   bottom does. That is the same line the script uses to say a step is reached, so a node
+   lights at the very moment the lit strand gets to it. The compositor does the drawing. The
+   timeline is given no inset: by default it takes the page's scroll-padding-top (the 124px the
+   floating bar needs), which would put the lit strand's end 80px below the reading line. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .process-line-fill { animation: process-draw-x linear both; animation-timeline: view(); animation-range: cover 22% cover 52%; }
-    .process-node { animation: process-node-on linear both; animation-timeline: view(); animation-range: cover 22% cover 27%; }
-    .process-list > li:nth-child(2) .process-node { animation-range: cover 32% cover 37%; }
-    .process-list > li:nth-child(3) .process-node { animation-range: cover 42% cover 47%; }
+    .process-line-fill { animation: process-draw-y linear both; animation-timeline: view(block 0px 0px); animation-range: cover 38vh cover calc(100% - 62vh); }
   }
+}
+
+/* Where scrolling cannot draw the strand (reduced motion, or a browser without scroll timelines)
+   it is lit as far as the last step reached, which the script measures (--reach), so it never
+   says "done" while the steps beside it say "not yet". Under reduced motion it changes at once;
+   elsewhere it takes its time. Without the script it is simply drawn in full. */
+@media (prefers-reduced-motion: reduce) {
+  .process[data-watching] .process-line-fill { bottom: auto; height: var(--reach, 0px); }
+}
+@supports not (animation-timeline: view()) {
+  .process[data-watching] .process-line-fill { bottom: auto; height: var(--reach, 0px); transition: height 700ms ease; }
 }
 
 @media (max-width: 1050px) {
   .approach-section { padding-block: 110px; }
   .approach-heading { gap: 65px; }
-  .process { margin-top: 64px; }
-  .process-list { column-gap: 34px; }
+  .process { margin-top: 56px; }
+  .process-list > li { padding-left: 52px; column-gap: 32px; }
   .process-throughout { grid-template-columns: 150px minmax(0, 1fr); gap: 28px; margin-top: 64px; font-size: 17px; }
 }
 
-/* On a narrow screen the steps stack, and the strand turns to run down beside them. */
+/* On a narrow screen the steps stack beside the strand. */
 @media (max-width: 860px) {
+  .process { --num: 56px; }
   .approach-ribbon { display: none; }
-  .process-line { left: 6px; right: auto; top: 6px; bottom: 0; width: 1px; height: auto; mask-image: linear-gradient(180deg, black 82%, transparent); }
-  .process-line-fill { transform-origin: 50% 0; background: linear-gradient(180deg, var(--band-lit), oklch(.8 .1 268)); }
-  .process-list { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 52px; }
-  .process-list > li { display: block; position: relative; grid-row: auto; padding-left: 40px; }
-  .process-node { position: absolute; left: 0; top: 2px; }
-  .process-number { margin-top: 0; }
-  .process-text { max-width: 420px; }
-  .process-gets { max-width: 420px; }
+  .process-list { row-gap: 56px; }
+  .process-list > li { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'num' 'title' 'text' 'gets'; padding-left: 40px; }
+  .process-number { margin-bottom: 12px; }
+  .process-list h3 { font-size: 24px; }
+  .process-text { max-width: 420px; padding-top: 12px; }
+  .process-gets { max-width: 420px; margin-top: 30px; padding: 20px 0 0; border-left: 0; border-top: 1px solid color-mix(in oklch, var(--band-rule), oklch(.9 .06 258 / .6) calc(var(--lit) * 100%)); }
   .process-throughout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .process-line-fill { animation-name: process-draw-y; animation-range: cover 16% cover 74%; }
-      .process-node, .process-list > li:nth-child(2) .process-node, .process-list > li:nth-child(3) .process-node { animation-range: cover 24% cover 32%; }
-    }
-  }
 }
 
 @media (max-width: 700px) {
@@ -128,7 +213,7 @@
   .approach-heading { flex-direction: column; align-items: flex-start; gap: 24px; }
   .approach-heading > p { max-width: 390px; font-size: 14px; }
   .process { margin-top: 48px; }
-  .process-list h3 { margin-top: 12px; font-size: 21px; }
+  .process-list h3 { font-size: 22px; }
   .process-text { font-size: 14px; }
   .process-throughout { margin-top: 52px; font-size: 16px; }
 }

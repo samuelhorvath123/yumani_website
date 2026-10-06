@@ -9,6 +9,7 @@ import Brand from './brand';
 import AboutSection from './about-section';
 import ClosingScreen from './closing-screen';
 import Faq from './faq';
+import ProcessSteps from './process-steps';
 // The accordion's styles, imported from the server so they are inlined with the
 // rest of the page rather than loaded by the client chunk (see services.tsx).
 import './services.css';
@@ -39,9 +40,9 @@ const audience = [
 // Each step is named by what it leaves you holding. Every line restates something
 // this page already promises: none is a result, a figure or a client.
 const steps = [
-  { number: '01', title: 'First, we listen.', text: 'We talk to the people who do the work, map where the time goes, and agree on what better looks like.', gets: ['A map of where the time goes', 'A shared picture of what “better” looks like', 'An estimate you can plan around'] },
-  { number: '02', title: 'Then, we build.', text: 'In short rounds, with working software to try every few weeks. You tell us what’s off, and the next round fixes it.', gets: ['Working software every few weeks', 'Each round shaped by what you tell us', 'Nothing big decided without you'] },
-  { number: '03', title: 'Ready for the real world.', text: 'We test with real data, move your existing records across, and help your team get comfortable before we step back.', gets: ['Your existing records, moved across', 'A team that is comfortable with it', 'Fixes, answers and the next improvement'] },
+  { number: '1', title: 'First, we listen.', text: 'We talk to the people who do the work, map where the time goes, and agree on what better looks like.', gets: ['A map of where the time goes', 'A shared picture of what “better” looks like', 'An estimate you can plan around'] },
+  { number: '2', title: 'Then, we build.', text: 'In short rounds, with working software to try every few weeks. You tell us what’s off, and the next round fixes it.', gets: ['Working software every few weeks', 'Each round shaped by what you tell us', 'Nothing big decided without you'] },
+  { number: '3', title: 'Ready for the real world.', text: 'We test with real data, move your existing records across, and help your team get comfortable before we step back.', gets: ['Your existing records, moved across', 'A team that is comfortable with it', 'Fixes, answers and the next improvement'] },
 ];
 
 // Each row sets a good fit against its opposite, so the two columns read across.
@@ -117,7 +118,7 @@ export default function Home() {
             <ol className="process-list">
               {steps.map(({ number, title, text, gets }) => <li key={number} data-reveal="">
                 <span className="process-node" aria-hidden="true"/>
-                <span className="process-number figure">{number}</span>
+                <span className="process-number" aria-hidden="true">{number}</span>
                 <h3>{title}</h3>
                 <p className="process-text">{text}</p>
                 <div className="process-gets">
@@ -126,6 +127,7 @@ export default function Home() {
                 </div>
               </li>)}
             </ol>
+            <ProcessSteps />
           </div>
           <p className="process-throughout" data-reveal=""><span>Throughout</span>The same small team from the first call to long after launch, and one person from your side who knows how the work really runs, for about an hour a week.</p>
         </div>
