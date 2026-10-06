@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { STAGGER_MS, createProcessSteps, resolveReached } from '../lib/process-steps.ts';
+import { STAGGER_MS, createProcessSteps, resolveReached, translateYOf } from '../lib/process-steps.ts';
 
 test('a step is reached once its node is on or above the reading line', () => {
   assert.deepEqual(resolveReached([100, 400, 700], 500), [true, true, false]);
@@ -113,4 +113,15 @@ test('the whole picture is reported after a reading in which something changed, 
   assert.deepEqual(h.pictures, [[true, true, false]], 'still the same two: no new report');
   h.scrollTo([700, 1000, 1300]);
   assert.deepEqual(h.pictures.at(-1), [false, false, false]);
+});
+
+test('the lift a step still has from rising into place is read from its computed transform', () => {
+  assert.equal(translateYOf('none'), 0);
+  assert.equal(translateYOf(''), 0);
+  assert.equal(translateYOf('matrix(1, 0, 0, 1, 0, 56)'), 56);
+  assert.equal(translateYOf('matrix(1, 0, 0, 1, 0, 5.39)'), 5.39);
+  assert.equal(translateYOf('matrix(1, 0, 0, 1, 12, -8)'), -8);
+  assert.equal(translateYOf('matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 56, 0, 1)'), 56);
+  assert.equal(translateYOf('rotate(3deg)'), 0, 'anything it cannot read moves nothing');
+  assert.equal(translateYOf('matrix(1, 0, 0, 1, 0, nonsense)'), 0);
 });

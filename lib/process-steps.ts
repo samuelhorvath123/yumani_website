@@ -10,6 +10,20 @@
  *  the page still reads in order: first, then, ready. */
 export const STAGGER_MS = 420;
 
+/**
+ * How far down a computed `transform` has moved its element, in px: the `m42` of the matrix
+ * the browser reports (`none`, `matrix(a, b, c, d, e, f)` or `matrix3d(...)`). The steps rise
+ * into place from 56px lower while they are revealed, and a node measured then is that much
+ * further down than the node the strand has to meet.
+ */
+export function translateYOf(transform: string): number {
+  const match = /^matrix(3d)?\(([^)]*)\)$/.exec(transform.trim());
+  if (!match) return 0;
+  const values = match[2].split(',').map((value) => Number.parseFloat(value));
+  const y = match[1] ? values[13] : values[5];
+  return Number.isFinite(y) ? y : 0;
+}
+
 /** A step is reached once its node is on or above the reading line. */
 export function resolveReached(nodes: number[], line: number): boolean[] {
   return nodes.map((top) => top <= line);

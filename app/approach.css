@@ -13,6 +13,8 @@
   --band-rule: oklch(.75 .045 256 / .3);
   --band-lit: oklch(.9 .06 258);
   --band-dim: oklch(.6 .09 260);
+  /* What a step's numeral is until it is reached. */
+  --band-ghost: oklch(.54 .12 261);
   position: relative;
   isolation: isolate;
   /* clip, not hidden: hidden would make this the scroller the strand's scroll
@@ -34,7 +36,7 @@
 /* The same ribbon that crosses the services, carried onto the blue. It sits on the
    strand the steps hang on and is gone just below it, so it gathers into the strand
    the way the hero's four strands resolve into one, and never lies behind a line of
-   copy. Where the steps stack the strand turns vertical and the ribbon steps aside. */
+   copy. At 860px and below the ribbon steps aside. */
 .approach-ribbon { position: absolute; z-index: -1; display: block; left: 50%; top: 6px; width: calc(100vw + 80px); aspect-ratio: 3 / 1; translate: -50% -50%; opacity: .2; mix-blend-mode: screen; pointer-events: none; mask-image: linear-gradient(180deg, transparent 14%, black 30%, black 46%, transparent 54%); }
 .approach-ribbon img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .approach-section h2 { color: var(--band-ink); }
@@ -111,7 +113,7 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: -.055em;
-  color: color-mix(in oklch, oklch(.54 .12 261), var(--band-lit) calc(var(--lit) * 100%));
+  color: color-mix(in oklch, var(--band-ghost), var(--band-lit) calc(var(--lit) * 100%));
   transition: color 700ms ease;
 }
 .process-list h3 { grid-area: title; margin: 0; font-size: clamp(24px, 2.3vw, 30px); line-height: 1.25; letter-spacing: -.03em; color: var(--band-ink); }
@@ -169,7 +171,8 @@
    bottom does. That is the same line the script uses to say a step is reached, so a node
    lights at the very moment the lit strand gets to it. The compositor does the drawing. The
    timeline is given no inset: by default it takes the page's scroll-padding-top (the 124px the
-   floating bar needs), which would put the lit strand's end 80px below the reading line. */
+   floating bar needs, 164px on a phone), which would put the lit strand's end that far below the
+   reading line. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .process-line-fill { animation: process-draw-y linear both; animation-timeline: view(block 0px 0px); animation-range: cover 38vh cover calc(100% - 62vh); }
@@ -220,4 +223,7 @@
 
 @media (prefers-contrast: more) {
   .approach-section { --band-rule: oklch(.9 .03 256 / .6); --band-text: oklch(.95 .02 257); --band-accent-text: oklch(.95 .02 257); }
+  /* A step not yet reached stays a ghost, but one that can be read: its numeral is large type
+     (3:1 is the floor) and its node is a control-sized mark. */
+  .approach-section { --band-ghost: oklch(.78 .07 260); --band-dim: oklch(.78 .07 260); }
 }

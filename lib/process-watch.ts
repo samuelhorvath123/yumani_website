@@ -1,19 +1,26 @@
-import { createProcessSteps } from './process-steps';
+import { createProcessSteps, translateYOf } from './process-steps';
 
 // Where the reader is looking, as a share of the window's height. The strand's scroll
 // timeline in app/approach.css reads from the same line (62vh): keep the two together.
 const READING_LINE = 0.62;
 
+// Where the middle of a node is once its step has settled. A step rises into place from 56px
+// lower when it is revealed, over 2.6 seconds, and nothing fires when that ends: read while it
+// is still moving, the node would sit up to 56px below the line it is about to meet (and the
+// strand, which is not part of the step, would be lit past a node still shown as a ghost until
+// the next scroll). So the step's own lift is taken off.
 const middle = (node: HTMLElement) => {
   const box = node.getBoundingClientRect();
-  return box.top + box.height / 2;
+  const step = node.closest('li');
+  const lift = step ? translateYOf(getComputedStyle(step).transform) : 0;
+  return box.top + box.height / 2 - lift;
 };
 
 /**
  * Binds the process steps to the page: marks each step as it is reached, and tells it how far
  * the strand runs from its node to the next, so the spark of light knows how far to go.
- * Written against the DOM and nothing else, so the site and its static preview run the same
- * code. Returns the function that undoes it.
+ * Written against the DOM and nothing else, so it runs wherever the page does. Returns the
+ * function that undoes it.
  */
 export function watchProcess(root: HTMLElement): () => void {
   const items = Array.from(root.querySelectorAll<HTMLElement>('.process-list > li'));

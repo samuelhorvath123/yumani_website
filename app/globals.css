@@ -32,7 +32,7 @@
   --morph-curve: cubic-bezier(0.3, 0.7, 0.2, 1);
   --morph-beat: 80ms;
   /* Used only where a number or an identifier should read as a number or an
-     identifier: step numbers and the register figures. Never for prose. */
+     identifier: the register figures. Never for prose. */
   --font-figure: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   /* Arrival: one dial for how slowly content rises into place, and how deep it
      starts. Slower reads better than shorter here, so the tail of the curve is
@@ -46,7 +46,7 @@
   --rise-hero-step: 270ms;
   --rise-hero-depth: 44px;
   --rise-art: 3750ms;
-  /* The list spotlight (services, audience): the row under the pointer stays
+  /* The list spotlight (services, audience, questions): the row under the pointer stays
      at full strength while its neighbours settle back to --spot-floor, its title
      slides --spot-slide to the right (the tagline half as far, so the two read as
      layers) and a hairline of cobalt draws across its divider. Short and sharp
@@ -60,7 +60,8 @@
   /* The open service keeps more of its strength, because it is holding text. */
   --spot-floor-open: 0.62;
   /* The stagger: how far each of the first four items in a list steps along, as a
-     fraction of that list's full step (services, and the who-this-is-for band). */
+     fraction of that list's full step (services, the who-this-is-for band and the
+     questions, which carry on repeating the four steps for as many rows as they have). */
   --stagger-1: 0;
   --stagger-2: 0.62;
   --stagger-3: 1;
@@ -69,9 +70,11 @@
 /* The bar pulls itself together by animating its size, type and spacing, which is layout on
    every frame of the move. On a phone that fell at the moment the first service came into
    view, and turned the scroll there into a run of slow frames (a fifth of the work of the
-   whole section, measured). There the bar is already fading in, in its floating shape, so
-   the move has nothing to show and nothing to pay for. */
-@media (hover: none), (max-width: 700px) {
+   whole section, measured). There the bar is not pinned, it leaves with the hero and comes
+   back already fading in, in its floating shape, so the move has nothing to show and
+   nothing to pay for. Wider screens keep it: the bar is pinned there and has nothing to
+   fade, so the move is all that softens the change. */
+@media (max-width: 700px) {
   :root { --morph: 0s; --morph-beat: 0s; }
 }
 

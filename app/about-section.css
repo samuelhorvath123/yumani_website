@@ -11,10 +11,12 @@
 #about .belief-copy > p { max-width: 540px; }
 #about .quality-promise { margin-top: 20px; }
 /* The team: a room that opens as you scroll into it, holding a shallow, concave stage. The card in the middle faces
-   you; its neighbours turn toward you and dissolve into the blue. All of it is scroll-driven CSS and none of it
-   asks the browser to repaint anything (transform and opacity only, no JavaScript per frame); without that support,
-   or under reduced motion, the room is simply open and the strip is flat and level. */
-#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); --team-room-blue: oklch(.38 .13 262); --team-wrap: min(1280px, calc(100% - 112px)); --team-open-scale: .84; --team-panel-sx: .8; --team-panel-sy: .82; position: relative; isolation: isolate; timeline-scope: --team-strip; view-timeline: --team-open block; padding-block: 52px 16px; }
+   you; its neighbours turn toward you and dissolve into the blue. All of it is scroll-driven CSS, with no JavaScript
+   per frame, and the motion itself (the opening, the tilt, the haze, the wave) is transform and opacity only, so the
+   browser moves layers rather than repainting them; the exceptions are the keyboard focus ring and, with a pointer,
+   the edge mask. Without that support, or under reduced motion, the room is simply open and the strip is flat and
+   level. */
+#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); --team-room-blue: oklch(.38 .13 262); --team-open-scale: .84; --team-panel-sx: .8; --team-panel-sy: .82; position: relative; isolation: isolate; timeline-scope: --team-strip; view-timeline: --team-open block; padding-block: 52px 16px; }
 /* The room: a deeper, evening blue than the section around it. It is as wide as the page plus the width of its own
    corners, so that once it has opened they fall outside the page and the band has a straight edge. */
 #about .team-carousel::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(var(--radius-surface) * -1 - 2px); border-radius: var(--radius-surface); pointer-events: none; background: radial-gradient(60% 90% at 85% 0%, oklch(.5 .135 272 / .5), transparent 70%), radial-gradient(55% 80% at 8% 100%, oklch(.46 .105 238 / .42), transparent 70%), linear-gradient(180deg, oklch(.4 .13 262), oklch(.34 .12 264)); }
@@ -97,13 +99,18 @@
   #about .team-viewport { cursor: grab; user-select: none; }
   #about .team-viewport[data-dragging='true'] { cursor: grabbing; scroll-snap-type: none; }
 }
-/* The wider the page, the further in the panel starts, so its margins still show around it. */
-@media (min-width: 1300px) { #about .team-carousel { --team-panel-sx: .7; } }
-@media (min-width: 1700px) { #about .team-carousel { --team-panel-sx: .6; } }
+/* The wider the page, the further in the panel starts, so its margins still show around it. What it holds is the content
+   column (1280px at most, so 1075px once drawn in to 84%), and the panel has to start wider than that with room to
+   spare, which is what each of these steps is: the narrowest the panel can be at the narrowest page the step covers,
+   with at least 16px between it and the heading on either side. */
+@media (min-width: 1300px) { #about .team-carousel { --team-panel-sx: .78; } }
+@media (min-width: 1500px) { #about .team-carousel { --team-panel-sx: .73; } }
+@media (min-width: 1700px) { #about .team-carousel { --team-panel-sx: .65; } }
+@media (min-width: 1900px) { #about .team-carousel { --team-panel-sx: .58; } }
+@media (min-width: 2200px) { #about .team-carousel { --team-panel-sx: .5; } }
 @media (max-width: 1050px) {
   #about .about-stage { padding-block: 64px 40px; }
   #about .about-overview { gap: 36px; }
-  #about .team-carousel { --team-wrap: calc(100% - 64px); }
   #about .team-toolbar h3 { font-size: 27px; }
 }
 @media (max-width: 700px) {
@@ -112,7 +119,7 @@
   #about .about-intro h2 { max-width: 530px; font-size: clamp(38px, 7.9vw, 50px); }
   #about .about-art { inset: 0 -60px 15% 5%; mask-image: linear-gradient(90deg, transparent, black 50%), linear-gradient(180deg, black 25%, transparent); }
   #about .about-lead { max-width: 430px; font-size: 19px; margin-top: 16px; }
-  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); --team-wrap: calc(100% - 40px); --team-panel-sy: .88; padding-block: 40px 8px; }
+  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); --team-panel-sy: .88; padding-block: 40px 8px; }
   #about .team-toolbar { align-items: start; gap: 20px; }
   #about .team-toolbar h3 { font-size: 24px; max-width: 250px; }
   #about .team-toolbar p { font-size: 12px; max-width: 230px; }
