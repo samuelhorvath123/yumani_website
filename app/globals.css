@@ -66,6 +66,14 @@
   --stagger-3: 1;
   --stagger-4: 0.5;
 }
+/* The bar pulls itself together by animating its size, type and spacing, which is layout on
+   every frame of the move. On a phone that fell at the moment the first service came into
+   view, and turned the scroll there into a run of slow frames (a fifth of the work of the
+   whole section, measured). There the bar is already fading in, in its floating shape, so
+   the move has nothing to show and nothing to pay for. */
+@media (hover: none), (max-width: 700px) {
+  :root { --morph: 0s; --morph-beat: 0s; }
+}
 
 * { box-sizing: border-box; }
 html { --sticky-clearance: 124px; scroll-behavior: smooth; scroll-padding-top: var(--sticky-clearance); }
@@ -396,15 +404,17 @@ h1 { font-size: inherit; line-height: 1.08; letter-spacing: -0.052em; font-weigh
    the page stays complete without JavaScript, in print and under reduced motion. */
 [data-reveal] { transition: opacity var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms), transform var(--rise) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms); }
 /* Groups settle in one after another rather than all at once. */
-.service-list .service-item:nth-child(2), .faq-list .faq-item:nth-child(2), .process-list > :nth-child(2), .fit-grid > :nth-child(2), .belief-principles > :nth-child(2), .audience-list > :nth-child(2) { --reveal-delay: var(--rise-stagger); }
+.service-list .service-item:nth-child(2), .faq-list .faq-item:nth-child(2), .process-list > :nth-child(2), .belief-principles > :nth-child(2), .audience-list > :nth-child(2) { --reveal-delay: var(--rise-stagger); }
 .service-list .service-item:nth-child(3), .faq-list .faq-item:nth-child(3), .process-list > :nth-child(3), .belief-principles > :nth-child(3), .audience-list > :nth-child(3) { --reveal-delay: calc(var(--rise-stagger) * 2); }
 .service-list .service-item:nth-child(4), .faq-list .faq-item:nth-child(4), .belief-principles > :nth-child(4), .audience-list > :nth-child(4) { --reveal-delay: calc(var(--rise-stagger) * 3); }
+.faq-list .faq-item:nth-child(5) { --reveal-delay: calc(var(--rise-stagger) * 4); }
+.faq-list .faq-item:nth-child(6) { --reveal-delay: calc(var(--rise-stagger) * 5); }
 h2 { font-size: clamp(34px, 3.25vw, 47px); font-weight: 500; line-height: 1.19; letter-spacing: -0.04em; margin: 0; }
 /* Headings break evenly rather than orphaning a word; paragraphs avoid a
    single word on their last line. Both degrade silently where unsupported. */
 h1, h2, h3, .rotator { text-wrap: balance; }
 p, li, figcaption, .closing-foot p { text-wrap: pretty; }
-.services-section h2, .audience-section h2, .fit-section h2, .faq-section h2 { color: var(--heading-quiet); }
+.services-section h2, .audience-section h2, .faq-section h2 { color: var(--heading-quiet); }
 h3 { font-weight: 600; }
 .services-section { position: relative; isolation: isolate; padding-block: 200px; }
 .services-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; }
@@ -456,14 +466,15 @@ h3 { font-weight: 600; }
 .audience-heading > p { font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 430px; margin: 0 0 4px; }
 .audience-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; list-style: none; padding: 0; margin: 64px 0 0; }
 .audience-list li { border-top: 1px solid var(--border); padding-top: 22px; }
-/* Both lists step, from the same four numbers (--stagger-1 to --stagger-4). The service
-   rows start further in (see services.css), the people in the audience band sit lower
-   in turn, and the right-hand edge stays put so the page still has a spine. */
-.service-list, .audience-list { --stagger: 0; }
-:is(.service-list, .audience-list) > :nth-child(1) { --stagger: var(--stagger-1); }
-:is(.service-list, .audience-list) > :nth-child(2) { --stagger: var(--stagger-2); }
-:is(.service-list, .audience-list) > :nth-child(3) { --stagger: var(--stagger-3); }
-:is(.service-list, .audience-list) > :nth-child(4) { --stagger: var(--stagger-4); }
+/* The lists step, from the same four numbers (--stagger-1 to --stagger-4), repeating every
+   four for a longer list. The service rows and the questions start further in (see
+   services.css and faq.css), the people in the audience band sit lower in turn, and the
+   right-hand edge stays put so the page still has a spine. */
+.service-list, .audience-list, .faq-list { --stagger: 0; }
+:is(.service-list, .audience-list, .faq-list) > :nth-child(4n + 1) { --stagger: var(--stagger-1); }
+:is(.service-list, .audience-list, .faq-list) > :nth-child(4n + 2) { --stagger: var(--stagger-2); }
+:is(.service-list, .audience-list, .faq-list) > :nth-child(4n + 3) { --stagger: var(--stagger-3); }
+:is(.service-list, .audience-list, .faq-list) > :nth-child(4n + 4) { --stagger: var(--stagger-4); }
 .audience-list li { margin-top: calc(var(--stagger) * clamp(0px, 3.4vw, 48px)); }
 .audience-list span { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
 .audience-list p { margin: 12px 0 0; font-size: 15px; line-height: 1.7; color: var(--muted-foreground); max-width: 300px; }

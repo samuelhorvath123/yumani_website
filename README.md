@@ -22,7 +22,7 @@ npx tsc --noEmit
 
 - Page content and email links: `app/page.tsx`
 - Services: `app/services.tsx`
-- Approach steps, the good-fit / not-a-fit rows and the audience: `app/page.tsx`. Questions and answers: `app/faq.tsx`. Their styles: `app/approach.css`, `app/fit.css`, `app/faq.css`. Keep every answer to what the page already promises: no prices, timelines or results that are not already stated elsewhere on it.
+- Approach steps, the good-fit / not-a-fit rows and the audience: `app/page.tsx`. Questions and answers: `app/faq.tsx`. Their styles: `app/approach.css` and `app/faq.css`. Keep every answer to what the page already promises: no prices, timelines or results that are not already stated elsewhere on it.
 - Design tokens and responsive styles: `app/globals.css`
 - Page metadata: `app/layout.tsx`
 - Brand and design context: `PRODUCT.md` and `DESIGN.md`
