@@ -1,12 +1,20 @@
-/* Questions worth asking. The disclosure is the services list's, simplified: the
-   same hairlines, the same wash on the open row, the same plus that turns into a
-   minus, with the question in place of the icon and the challenge line. */
+/* Questions worth asking. The rows are the service list's own: the same hairlines, the
+   same wash on the open row, the same plus that turns into a minus, the same speed to
+   open, and the same answer to the pointer (the row under it stays at full strength, the
+   others settle back, its question slides right and a cobalt line draws across its
+   divider) and the same step in from the left. What they do not have is an icon and a
+   challenge line: the question stands in for both. */
 #faq {
   --faq-ease: cubic-bezier(.22, 1, .36, 1);
+  /* How long a question takes to open: the services' 460ms, not the 650ms it started with. */
+  --faq-open: 460ms;
   --faq-inset: 24px;
   --faq-rule: oklch(.79 .041 260 / .38);
-  padding-block: 120px 160px;
-  border-top: 1px solid var(--border);
+  /* Each row starts further in along the same pattern as the services (--stagger in
+     globals.css), by a smaller step because this list is the narrower column. */
+  --faq-drift: clamp(0px, 3.6vw, 52px);
+  /* The first light chapter after a deep-blue one, so it opens as the audience band does. */
+  padding-block: 150px 160px;
 }
 #faq .faq-inner { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 115px; align-items: start; }
 #faq .faq-heading { position: sticky; top: calc(var(--sticky-clearance) + 24px); }
@@ -14,7 +22,7 @@
 #faq .faq-heading p { margin: 24px 0 14px; max-width: 400px; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
 
 #faq .faq-list { display: flex; flex-direction: column; width: 100%; border-top: 1px solid var(--faq-rule); }
-#faq .faq-item { position: relative; isolation: isolate; min-width: 0; border-bottom: 1px solid var(--faq-rule); }
+#faq .faq-item { position: relative; isolation: isolate; min-width: 0; margin-left: calc(var(--stagger) * var(--faq-drift)); border-bottom: 1px solid var(--faq-rule); }
 #faq .faq-item::before {
   content: '';
   position: absolute;
@@ -23,9 +31,39 @@
   pointer-events: none;
   background: linear-gradient(110deg, oklch(.94 .033 264 / .76), oklch(.975 .014 252 / .4) 68%, oklch(.985 .005 255 / 0));
   opacity: 0;
-  transition: opacity 800ms var(--faq-ease);
+  transition: opacity 560ms var(--faq-ease);
 }
 #faq .faq-item:has(.faq-trigger[aria-expanded='true'])::before { opacity: 1; }
+
+/* Spotlight, exactly as in the service list (see the --spot-* tokens and the --spot / --on
+   switches explained in globals.css). The row's header and its panel are what dim, because
+   the row itself carries the arrival and the panel's own opacity belongs to opening and
+   closing. Keyboard focus gives the focused row the slide and the line but does not dim the
+   others, which would last as long as focus rests there. */
+#faq .faq-list { --spot: 0; }
+#faq .faq-item { --on: 0; }
+#faq .faq-item:has(.faq-trigger[aria-expanded='true']) { --spot-floor: var(--spot-floor-open); }
+#faq .faq-item:has(.faq-trigger:focus-visible) { --on: 1; }
+@media (hover: hover) and (pointer: fine) {
+  #faq .faq-list:has(.faq-item:hover) { --spot: 1; }
+  #faq .faq-item:hover { --on: 1; }
+}
+#faq .faq-heading-row, #faq .faq-panel-clip {
+  opacity: calc(1 - var(--spot) * (1 - var(--on)) * (1 - var(--spot-floor)));
+  transition: opacity var(--spot-fade) var(--spot-ease);
+}
+#faq .faq-question { translate: calc(var(--on) * var(--spot-slide)) 0; transition: translate var(--spot-time) var(--spot-ease); }
+#faq .faq-item::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: var(--primary);
+  pointer-events: none;
+  transform: scaleX(var(--on));
+  transform-origin: calc((1 - var(--on)) * 100%) 50%;
+  transition: transform var(--spot-time) var(--spot-ease);
+}
 
 #faq .faq-heading-row { display: flex; margin: 0; }
 #faq .faq-trigger {
@@ -35,8 +73,8 @@
   gap: 24px;
   align-items: center;
   min-width: 0;
-  min-height: 88px;
-  padding: 22px var(--faq-inset);
+  min-height: 104px;
+  padding: 26px var(--faq-inset);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -49,7 +87,7 @@
 #faq .faq-trigger:hover { background: oklch(.945 .024 260 / .26); color: var(--primary); }
 #faq .faq-trigger[aria-expanded='true'] { color: var(--primary); }
 #faq .faq-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; z-index: 1; }
-#faq .faq-question { font-size: clamp(19px, 1.7vw, 23px); font-weight: 500; line-height: 1.3; letter-spacing: -.03em; text-wrap: balance; }
+#faq .faq-question { font-size: clamp(21px, 1.9vw, 26px); font-weight: 500; line-height: 1.3; letter-spacing: -.035em; text-wrap: balance; }
 
 #faq .faq-toggle {
   position: relative;
@@ -68,7 +106,7 @@
   height: 1.5px;
   border-radius: 1px;
   background: currentColor;
-  transition: transform 650ms var(--faq-ease), opacity 450ms var(--faq-ease);
+  transition: transform var(--faq-open) var(--faq-ease), opacity 320ms var(--faq-ease);
 }
 #faq .faq-toggle span:last-child { transform: rotate(90deg); }
 #faq .faq-trigger:hover .faq-toggle { color: var(--primary); }
@@ -82,19 +120,18 @@
   grid-template-rows: 0fr;
   opacity: 0;
   visibility: hidden;
-  transition: grid-template-rows 650ms var(--faq-ease), opacity 550ms var(--faq-ease), visibility 0s linear 650ms;
+  transition: grid-template-rows var(--faq-open) var(--faq-ease), opacity 380ms var(--faq-ease), visibility 0s linear var(--faq-open);
 }
 #faq .faq-panel[data-open='true'] { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
 #faq .faq-panel-clip { min-height: 0; overflow: hidden; }
-#faq .faq-answer { padding: 0 calc(var(--faq-inset) + 36px + 24px) 30px var(--faq-inset); }
+#faq .faq-answer { padding: 0 calc(var(--faq-inset) + 36px + 24px) 32px var(--faq-inset); }
 #faq .faq-answer p { max-width: 560px; margin: 0; color: var(--muted-foreground); font-size: 15px; line-height: 1.75; }
 #faq .faq-link { color: var(--primary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in oklch, var(--primary) 45%, transparent); transition: text-decoration-color 300ms ease; }
 #faq .faq-link:is(:hover, :focus-visible) { text-decoration-color: var(--primary); }
 
 @media (max-width: 1050px) {
-  #faq { padding-block: 96px 120px; }
+  #faq { padding-block: 110px 120px; --faq-inset: 16px; --faq-drift: 3.4vw; }
   #faq .faq-inner { gap: 56px; }
-  #faq { --faq-inset: 16px; }
 }
 
 @media (max-width: 860px) {
@@ -103,13 +140,18 @@
 }
 
 @media (max-width: 700px) {
-  #faq { padding-block: 72px 96px; --faq-inset: 0px; }
+  #faq { padding-block: 80px 96px; --faq-inset: 0px; --faq-drift: 14px; }
   #faq .faq-heading p { font-size: 14px; }
-  #faq .faq-trigger { grid-template-columns: minmax(0, 1fr) 28px; gap: 16px; min-height: 76px; padding-block: 18px; }
+  #faq .faq-trigger { grid-template-columns: minmax(0, 1fr) 28px; gap: 16px; min-height: 92px; padding-block: 22px; }
+  #faq .faq-question { font-size: clamp(19px, 5.2vw, 22px); }
   #faq .faq-toggle { width: 28px; height: 28px; }
   #faq .faq-item::before { inset-inline: -12px; }
   #faq .faq-answer { padding: 0 12px 26px 0; }
   #faq .faq-answer p { font-size: 14px; }
+}
+
+@media (max-width: 380px) {
+  #faq { --faq-drift: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

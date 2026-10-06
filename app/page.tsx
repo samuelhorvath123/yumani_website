@@ -1,4 +1,4 @@
-import { ArrowUpRight, ArrowDown, Check, X } from 'lucide-react';
+import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import Services from './services';
 import HeroExperience from './hero-experience';
 import FlowArtwork from './flow-artwork';
@@ -14,7 +14,6 @@ import ProcessSteps from './process-steps';
 // rest of the page rather than loaded by the client chunk (see services.tsx).
 import './services.css';
 import './approach.css';
-import './fit.css';
 import './faq.css';
 
 // Every contact button leads to the survey. The address stays visible below it for
@@ -43,14 +42,6 @@ const steps = [
   { number: '1', title: 'First, we listen.', text: 'We talk to the people who do the work, map where the time goes, and agree on what better looks like.', gets: ['A map of where the time goes', 'A shared picture of what “better” looks like', 'An estimate you can plan around'] },
   { number: '2', title: 'Then, we build.', text: 'In short rounds, with working software to try every few weeks. You tell us what’s off, and the next round fixes it.', gets: ['Working software every few weeks', 'Each round shaped by what you tell us', 'Nothing big decided without you'] },
   { number: '3', title: 'Ready for the real world.', text: 'We test with real data, move your existing records across, and help your team get comfortable before we step back.', gets: ['Your existing records, moved across', 'A team that is comfortable with it', 'Fixes, answers and the next improvement'] },
-];
-
-// Each row sets a good fit against its opposite, so the two columns read across.
-const fit = [
-  { yes: { title: 'You can plan in weeks.', detail: 'You would rather see it built properly, in short rounds, than rushed to a deadline.' }, no: { title: 'You need it finished by Friday.', detail: 'Real work takes weeks. Pretending otherwise would be the first thing we got wrong.' } },
-  { yes: { title: 'You want an honest estimate.', detail: 'A number you can plan around, even when it is not the lowest one on the table.' }, no: { title: 'The decision will be made on price alone.', detail: 'We are not the cheapest, and we would rather say that now than surprise you later.' } },
-  { yes: { title: 'Someone can spare an hour a week.', detail: 'A person who knows how the work really runs, in the room while we build.' }, no: { title: 'Nobody on your side can spare an hour a week.', detail: 'Someone who knows how the work really runs has to be in the room, or we are only guessing.' } },
-  { yes: { title: 'You want AI that earns its place.', detail: 'Help with the reading, sorting and searching that eats hours, with a person still making the decisions.' }, no: { title: 'You want AI because everyone else has it.', detail: 'We add AI where it saves real time, and we’ll tell you when a simple rule would do the job better.' } },
 ];
 
 export default function Home() {
@@ -130,23 +121,6 @@ export default function Home() {
             <ProcessSteps />
           </div>
           <p className="process-throughout" data-reveal=""><span>Throughout</span>The same small team from the first call to long after launch, and one person from your side who knows how the work really runs, for about an hour a week.</p>
-        </div>
-      </section>
-
-      <section className="fit-section wrap" id="fit" aria-labelledby="fit-title">
-        <div className="fit-heading" data-reveal="">
-          <div><h2 id="fit-title">Straight talk about<br/>who we’re right for.</h2></div>
-          <p>Better to find that out in the first conversation than in the third month.</p>
-        </div>
-        <div className="fit-grid">
-          <div className="fit-col fit-col-yes" data-reveal="">
-            <h3 className="fit-col-title">A good fit</h3>
-            <ul>{fit.map(({ yes }) => <li key={yes.title}><Check size={18} aria-hidden="true"/><div><strong>{yes.title}</strong><p>{yes.detail}</p></div></li>)}</ul>
-          </div>
-          <div className="fit-col fit-col-no" data-reveal="">
-            <h3 className="fit-col-title">Not the right fit</h3>
-            <ul>{fit.map(({ no }) => <li key={no.title}><X size={18} aria-hidden="true"/><div><strong>{no.title}</strong><p>{no.detail}</p></div></li>)}</ul>
-          </div>
         </div>
       </section>
 
