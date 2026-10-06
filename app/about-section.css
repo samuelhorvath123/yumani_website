@@ -11,12 +11,13 @@
 #about .belief-copy > p { max-width: 540px; }
 #about .quality-promise { margin-top: 20px; }
 /* The team: a room that opens as you scroll into it, holding a shallow, concave stage. The card in the middle faces
-   you; its neighbours turn toward you and dissolve into the blue. All of it is scroll-driven CSS (transform, opacity
-   and the room's clip, no JavaScript per frame); without that support, or under reduced motion, the room is simply
-   open and the strip is flat and level. */
-#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); --team-room-blue: oklch(.38 .13 262); --team-wrap: min(1280px, calc(100% - 112px)); --team-open-scale: .84; --team-open-inset: calc((100% - var(--team-open-scale) * var(--team-wrap)) / 2 - 28px); --team-open-inset-y: 60px; position: relative; isolation: isolate; timeline-scope: --team-strip; view-timeline: --team-open block; padding-block: 52px 16px; }
-/* The room: a deeper, evening blue than the section around it. */
-#about .team-carousel::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(60% 90% at 85% 0%, oklch(.5 .135 272 / .5), transparent 70%), radial-gradient(55% 80% at 8% 100%, oklch(.46 .105 238 / .42), transparent 70%), linear-gradient(180deg, oklch(.4 .13 262), oklch(.34 .12 264)); }
+   you; its neighbours turn toward you and dissolve into the blue. All of it is scroll-driven CSS and none of it
+   asks the browser to repaint anything (transform and opacity only, no JavaScript per frame); without that support,
+   or under reduced motion, the room is simply open and the strip is flat and level. */
+#about .team-carousel { --team-card-w: clamp(230px, 20vw, 280px); --team-room-blue: oklch(.38 .13 262); --team-wrap: min(1280px, calc(100% - 112px)); --team-open-scale: .84; --team-panel-sx: .8; --team-panel-sy: .82; position: relative; isolation: isolate; timeline-scope: --team-strip; view-timeline: --team-open block; padding-block: 52px 16px; }
+/* The room: a deeper, evening blue than the section around it. It is as wide as the page plus the width of its own
+   corners, so that once it has opened they fall outside the page and the band has a straight edge. */
+#about .team-carousel::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(var(--radius-surface) * -1 - 2px); border-radius: var(--radius-surface); pointer-events: none; background: radial-gradient(60% 90% at 85% 0%, oklch(.5 .135 272 / .5), transparent 70%), radial-gradient(55% 80% at 8% 100%, oklch(.46 .105 238 / .42), transparent 70%), linear-gradient(180deg, oklch(.4 .13 262), oklch(.34 .12 264)); }
 #about .team-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 28px; }
 #about .team-toolbar h3 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -.035em; line-height: 1.25; }
 #about .team-toolbar p { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: oklch(.84 .038 258); }
@@ -75,11 +76,11 @@
     #about .team-portrait::after { animation-name: team-haze; }
     @keyframes team-haze { 0%, 100% { opacity: .7; } 50% { opacity: 0; } }
 
-    /* The room opens as you scroll into it: from a rounded panel inset from the page's margins to a full-bleed band, while everything inside it (heading, controls and stage) draws out from 84% to full size. */
+    /* The room opens as you scroll into it: from a rounded panel inset from the page's margins to a full-bleed band, while everything inside it (heading, controls and stage) draws out from 84% to full size. The panel grows from a scaled-down copy of itself rather than from a clip: a clip that changes every frame is repainted every frame (the whole room's gradient, at three times the pixels on a phone), where a scale is only moved. */
     #about .team-carousel::before, #about .team-room { animation-fill-mode: both; animation-timeline: --team-open; animation-range: cover 6% cover 42%; }
     #about .team-carousel::before { animation-name: team-open-room; animation-timing-function: cubic-bezier(.3, .6, .2, 1); }
     #about .team-room { animation-name: team-open-content; animation-timing-function: cubic-bezier(.3, .6, .2, 1); }
-    @keyframes team-open-room { from { clip-path: inset(var(--team-open-inset-y) var(--team-open-inset) round var(--radius-surface)); } to { clip-path: inset(0px 0px round 0px); } }
+    @keyframes team-open-room { from { transform: scale(var(--team-panel-sx), var(--team-panel-sy)); } to { transform: none; } }
     @keyframes team-open-content { from { transform: scale(var(--team-open-scale)); } to { transform: none; } }
     /* Keyboard focus rings the card in the middle, the one the arrow keys move between, rather than the whole padded strip. */
     #about .team-viewport:focus-visible { outline-color: transparent; }
@@ -88,10 +89,17 @@
   }
 }
 
+/* The edge fade is a mask, and a mask over a strip of moving cards makes the browser draw the whole strip into a separate surface and blend it back in on every frame. A phone has neither the room for it nor the need: the cards already thin out into the blue on their way to the edge (see team-haze) and the screen cuts them off there. */
+@media (hover: none), (max-width: 700px) {
+  #about .team-stage { mask-image: none; }
+}
 @media (hover: hover) and (pointer: fine) {
   #about .team-viewport { cursor: grab; user-select: none; }
   #about .team-viewport[data-dragging='true'] { cursor: grabbing; scroll-snap-type: none; }
 }
+/* The wider the page, the further in the panel starts, so its margins still show around it. */
+@media (min-width: 1300px) { #about .team-carousel { --team-panel-sx: .7; } }
+@media (min-width: 1700px) { #about .team-carousel { --team-panel-sx: .6; } }
 @media (max-width: 1050px) {
   #about .about-stage { padding-block: 64px 40px; }
   #about .about-overview { gap: 36px; }
@@ -104,7 +112,7 @@
   #about .about-intro h2 { max-width: 530px; font-size: clamp(38px, 7.9vw, 50px); }
   #about .about-art { inset: 0 -60px 15% 5%; mask-image: linear-gradient(90deg, transparent, black 50%), linear-gradient(180deg, black 25%, transparent); }
   #about .about-lead { max-width: 430px; font-size: 19px; margin-top: 16px; }
-  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); --team-wrap: calc(100% - 40px); --team-open-inset-y: 40px; padding-block: 40px 8px; }
+  #about .team-carousel { --team-card-w: clamp(200px, 62vw, 260px); --team-wrap: calc(100% - 40px); --team-panel-sy: .88; padding-block: 40px 8px; }
   #about .team-toolbar { align-items: start; gap: 20px; }
   #about .team-toolbar h3 { font-size: 24px; max-width: 250px; }
   #about .team-toolbar p { font-size: 12px; max-width: 230px; }

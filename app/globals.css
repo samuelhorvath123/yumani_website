@@ -66,6 +66,14 @@
   --stagger-3: 1;
   --stagger-4: 0.5;
 }
+/* The bar pulls itself together by animating its size, type and spacing, which is layout on
+   every frame of the move. On a phone that fell at the moment the first service came into
+   view, and turned the scroll there into a run of slow frames (a fifth of the work of the
+   whole section, measured). There the bar is already fading in, in its floating shape, so
+   the move has nothing to show and nothing to pay for. */
+@media (hover: none), (max-width: 700px) {
+  :root { --morph: 0s; --morph-beat: 0s; }
+}
 
 * { box-sizing: border-box; }
 html { --sticky-clearance: 124px; scroll-behavior: smooth; scroll-padding-top: var(--sticky-clearance); }
